@@ -7,5 +7,6 @@ requires-python = ">=3.13"
 dependencies = [
     "beautifulsoup4>=4.14.3",
     "brotli>=1.2.0",
+    "html2text>=2025.4.15",
     "requests>=2.32.5",
 ]

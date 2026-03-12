@@ -2,6 +2,7 @@ from typing import override
 import re
 import requests
 from bs4 import BeautifulSoup
+import html2text
 
 from ..base_scraper import BaseScraper
 
@@ -9,6 +10,7 @@ from ..base_scraper import BaseScraper
 class STSFandomScraper(BaseScraper):
     def __init__(self):
         super().__init__()
+        self.prefix: str = "stsfandom"
         self.base_url: str = "https://slay-the-spire.fandom.com"
         self.site_map: str = "https://slay-the-spire.fandom.com/wiki/Local_Sitemap"
         self.headers: dict[str, str] = {
@@ -30,14 +32,15 @@ class STSFandomScraper(BaseScraper):
             "Cache-Control": "no-cache",
         }
 
-    def _get_page(self, url: str):
-        return requests.get(url, headers=self.headers)
+    def _get_page_soup(self, url: str):
+        page = requests.get(url, headers=self.headers)
+        soup = BeautifulSoup(page.content, "html.parser")
+        return soup
 
     def _get_all_page_links(self) -> list[str]:
-        page = self._get_page(self.site_map)
+        soup = self._get_page_soup(self.site_map)
         output: list[str] = []
         while True:
-            soup = BeautifulSoup(page.content, "html.parser")
             links = soup.find_all("a")
             for link in links:
                 href = str(link.get("href"))
@@ -50,13 +53,49 @@ class STSFandomScraper(BaseScraper):
             if next_link == None:
                 break
             next_url = self.base_url + str(next_link.get("href"))
-            page = self._get_page(next_url)
+            soup = self._get_page_soup(next_url)
+        return output
+
+    def _html_to_md(self, html: str) -> str:
+        h = html2text.HTML2Text()
+        h.body_width = 0
+        h.ignore_links = True
+        h.ignore_images = True
+        return h.handle(html)
+
+    def _get_page_content(self, link: str) -> dict[str, str | list[str]]:
+        soup = self._get_page_soup(link)
+        title = soup.find("h1")
+        if title == None:
+            return {}
+        title_text = title.get_text().strip()
+        main = soup.find(id="mw-content-text")
+        if main == None:
+            return {}
+        return {
+            "id": f'{self.prefix}_{title_text.lower().replace(" ", "_")}',
+            "source": self.prefix,
+            "title": title_text,
+            "content": self._html_to_md(str(main)),
+            "url": link,
+            "tags": []
+        }
+
+    def _get_all_page_contents(self, links: list[str]) -> list[dict[str, str | list[str]]]:
+        output: list[dict[str, str | list[str]]] = []
+        for index, link in enumerate(links):
+            page_content = self._get_page_content(link)
+            if page_content.get("id") == None:
+                print(f"failed #{index}")
+                continue
+            output.append(page_content)
+            print(f"success #{index}")
         return output
 
     @override
     def fetch(self):
         links = self._get_all_page_links()
-        print(len(links))
-        data: list[dict[str, str]] = []
-        return data
+        print(f"Found {len(links)} pages")
+        output = self._get_all_page_contents(links)
+        return output
 

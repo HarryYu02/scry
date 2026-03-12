@@ -1,9 +1,14 @@
+import json
+
 from sources.stsfandom import STSFandomScraper
 
 
 def main():
     s = STSFandomScraper()
-    _ = s.fetch()
+    page_contents = s.fetch()
+    with open("sts.jsonl", "w", encoding="utf-8") as f:
+        for page_content in page_contents:
+            _ = f.write(json.dumps(page_content) + "\n")
 
 
 if __name__ == "__main__":
