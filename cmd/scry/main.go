@@ -7,7 +7,6 @@ import (
 	"encoding/json"
 
 	"github.com/HarryYu02/scry/internal/indexer"
-	"github.com/HarryYu02/scry/internal/parser"
 )
 
 
@@ -19,11 +18,11 @@ func main() {
 	}
 	defer file.Close()
 
-	sourceDocs := make([]parser.Document, 0)
+	sourceDocs := make([]indexer.Document, 0)
 	fileScanner := bufio.NewScanner(file)
 	for fileScanner.Scan() {
 		docBytes := fileScanner.Bytes()
-		var docContent parser.Document
+		var docContent indexer.Document
 		err := json.Unmarshal(docBytes, &docContent)
 		if err != nil {
 			fmt.Printf("err: %v\n", err)
@@ -32,9 +31,10 @@ func main() {
 		sourceDocs = append(sourceDocs, docContent)
 	}
 
-	docs, err := indexer.Search([]parser.Document{}, "", 3)
+	docs, err := indexer.Search(sourceDocs, "", 3)
 	if err != nil {
 		fmt.Printf("err: %v\n", err)
 		return
 	}
+	fmt.Printf("len(docs): %v\n", len(docs))
 }
