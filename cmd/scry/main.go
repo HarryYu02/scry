@@ -31,7 +31,7 @@ func main() {
 		sourceDocs = append(sourceDocs, docContent)
 	}
 
-	docs, err := indexer.Search(sourceDocs, "ectoplasm", 10)
+	docs, err := indexer.Search(sourceDocs, "silent defend", 10)
 	if err != nil {
 		fmt.Printf("err: %v\n", err)
 		return

@@ -55,7 +55,7 @@ func calculateInverseDocFreq(term string, index *TermFreqIndex) float64 {
 	if numDocsHaveTerm == 0.0 {
 		return 0.0
 	}
-	return math.Log(numDocs / numDocsHaveTerm)
+	return math.Log10(numDocs / numDocsHaveTerm)
 }
 
 func Search(source []Document, query string, count int) ([]Document, error) {
@@ -68,12 +68,18 @@ func Search(source []Document, query string, count int) ([]Document, error) {
 		return nil, err
 	}
 
-	term := strings.ToUpper(query)
-	idf := calculateInverseDocFreq(term, &index)
+	terms := strings.Fields(strings.ToUpper(query))
+	if len(terms) == 0 {
+		return nil, fmt.Errorf("Search expects query contains non-whitespace character")
+	}
+
 	tfidfMap := make(map[string]float64)
-	for id, termFreq := range index {
-		tf := calculateTermFreq(term, &termFreq)
-		tfidfMap[id] = (tf * idf)
+	for _, term := range terms {
+		idf := calculateInverseDocFreq(term, &index)
+		for id, termFreq := range index {
+			tf := calculateTermFreq(term, &termFreq)
+			tfidfMap[id] += (tf * idf)
+		}
 	}
 
 	sort.SliceStable(source, func(i, j int) bool {
