@@ -11,7 +11,7 @@ import (
 
 
 func main() {
-	file, err := os.Open("scraper/data/sts.jsonl")
+	file, err := os.Open("scraper/data/stsfandom.jsonl")
 	if err != nil {
 		fmt.Printf("err: %v\n", err)
 		return
@@ -31,10 +31,13 @@ func main() {
 		sourceDocs = append(sourceDocs, docContent)
 	}
 
-	docs, err := indexer.Search(sourceDocs, "", 3)
+	docs, err := indexer.Search(sourceDocs, "ectoplasm", 10)
 	if err != nil {
 		fmt.Printf("err: %v\n", err)
 		return
 	}
-	fmt.Printf("len(docs): %v\n", len(docs))
+
+	for i, doc := range docs {
+		fmt.Printf("%d: %s\n", i + 1, doc.ID)
+	}
 }
