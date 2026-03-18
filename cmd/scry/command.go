@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"strconv"
 	"strings"
 
 	"github.com/HarryYu02/scry/internal/indexer"
@@ -78,9 +79,34 @@ func commandSearch(config *Config, args []string) error {
 		return err
 	}
 
+	fmt.Println("")
+	fmt.Printf("Search query: %s\n", query)
+	fmt.Println("")
+	fmt.Println("Results:")
 	for i, doc := range docs {
-		fmt.Printf("%d: %s\n", i+1, doc.ID)
+		fmt.Printf("%0.2d: %s\n", i+1, doc.Title)
 	}
+	fmt.Printf("\nSelect by typing the number 1-%d (0 to cancel)\n> ", numResult)
+	var input string
+	_, err = fmt.Scanln(&input)
+	if err != nil {
+		return err
+	}
+	choice, err := strconv.Atoi(input)
+	if err != nil {
+		return err
+	}
+	if choice < 0 || choice > numResult {
+		return fmt.Errorf("invalid choice")
+	}
+	if choice == 0 {
+		fmt.Printf("Cancel search\n")
+		return nil
+	}
+
+	selectedDoc := docs[choice-1]
+	fmt.Printf("\n\n%s\n%s\n\n", selectedDoc.Title, selectedDoc.URL)
+	fmt.Printf("%s", selectedDoc.Content)
 	return nil
 }
 
