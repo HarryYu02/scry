@@ -9,7 +9,6 @@ import (
 	"github.com/HarryYu02/scry/internal/parser"
 )
 
-
 type Document = parser.Document
 type TermFreq = map[string]int
 type TermFreqIndex = map[string]TermFreq

@@ -6,7 +6,6 @@ import (
 	"unicode"
 )
 
-
 type Document struct {
 	ID      string   `json:"id"`
 	Source  string   `json:"source"`
@@ -25,7 +24,7 @@ func NewLexer(content string) *Lexer {
 	preparedContent := strings.TrimSpace(content)
 	return &Lexer{
 		Content: preparedContent,
-		Cursor: 0,
+		Cursor:  0,
 	}
 }
 
@@ -45,7 +44,7 @@ func isWhiteSpace(c byte) bool {
 	return unicode.IsSpace(rune(c))
 }
 
-func (l *Lexer)NextToken() string {
+func (l *Lexer) NextToken() string {
 	for isWhiteSpace(l.Content[l.Cursor]) {
 		l.Cursor++
 	}
