@@ -1,6 +1,6 @@
 # Scry Data Contract
 
-All ingestion scrapers must output data in `.jsonl` (JSON Lines) format. The Go indexer reads this file line-by-line to build the SQLite FTS5 database.
+All ingestion scrapers must output data in `.jsonl` (JSON Lines) format. The Go indexer reads this file line-by-line to build the index.
 
 ## Schema
 

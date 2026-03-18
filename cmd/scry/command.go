@@ -17,6 +17,7 @@ type Config struct {
 type Command struct {
 	name        string
 	description string
+	usage       string
 	callback    func(*Config, []string) error
 }
 
@@ -115,11 +116,13 @@ func getCommands() map[string]Command {
 		"help": {
 			name:        "help",
 			description: "Prints the list of commands",
+			usage:       "scry help [subcommand]",
 			callback:    commandHelp,
 		},
 		"search": {
 			name:        "search",
 			description: "Search the query from the given source",
+			usage:       "scry search <source> <query>",
 			callback:    commandSearch,
 		},
 	}

@@ -74,4 +74,4 @@ go run ./cmd/scry search ./scraper/data/stsfandom.jsonl "watcher scry"
 If you'd like to contribute, please fork the repository and open a pull request to the `main` branch.
 
 ## Resources
-- [tf-idf wiki](https://en.wikipedia.org/wiki/Tf%E2%80%93idf)
+- [TF-IDF (Term Frequency-Inverse Document Frequency)](https://en.wikipedia.org/wiki/Tf%E2%80%93idf)
