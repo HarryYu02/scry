@@ -33,4 +33,5 @@ go.work.sum
 
 # Python
 __pycache__/
+.venv/
 scraper/data/*.jsonl
