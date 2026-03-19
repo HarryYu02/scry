@@ -16,7 +16,6 @@ There is no release for the app yet, so you will need to clone the repo and run 
 
 ### Dependencies
 - go >= 1.25
-- python >= 3.13
 - uv >= 0.9
 
 ### 1. Clone the mono-repo
@@ -28,7 +27,6 @@ cd scry
 ### 2. Run the scraper
 ```bash
 cd scraper
-mkdir data
 uv run main.py
 ```
 It will take a while.
@@ -36,7 +34,7 @@ It will take a while.
 ### 3. Run the cli
 ```bash
 cd ..
-go run ./cmd/scry search ./scraper/data/stsfandom.jsonl "watcher scry"
+go run ./cmd/scry search stsfandom "watcher scry"
 ```
 
 ## Usage
@@ -47,7 +45,6 @@ Available commands:
 ## Contributing
 ### Dependencies
 - go >= 1.25
-- python >= 3.13
 - uv >= 0.9
 
 ### 1. Clone the mono-repo
@@ -67,7 +64,7 @@ It will take a while.
 ### 3. Run the cli
 ```bash
 cd ..
-go run ./cmd/scry search ./scraper/data/stsfandom.jsonl "watcher scry"
+go run ./cmd/scry search stsfandom "watcher scry"
 ```
 
 ### Submit a pull request
