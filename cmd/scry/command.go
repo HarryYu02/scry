@@ -2,6 +2,8 @@ package main
 
 import (
 	"bufio"
+	"bytes"
+	"encoding/gob"
 	"encoding/json"
 	"fmt"
 	"os"
@@ -64,6 +66,54 @@ func readDocs(path string) ([]indexer.Document, error) {
 	return sourceDocs, nil
 }
 
+func commandIndex(config *Config, args []string) error {
+	if len(args) < 1 {
+		return fmt.Errorf("index expects a source")
+	}
+	source := fmt.Sprintf("%s%s", args[0], ".jsonl")
+	sourcePath := filepath.Join(config.Root, "data", source)
+
+	sourceDocs, err := readDocs(sourcePath)
+	if err != nil {
+		return err
+	}
+
+	index, err := indexer.Index(sourceDocs)
+	if err != nil {
+		return err
+	}
+
+	var indexGob bytes.Buffer
+	enc := gob.NewEncoder(&indexGob)
+	err = enc.Encode(index)
+	if err != nil {
+		return err
+	}
+
+	indexDir := filepath.Join(config.Root, "index")
+	if dirStat, err := os.Stat(indexDir); err != nil || !dirStat.IsDir() {
+		err := os.MkdirAll(indexDir, 0750)
+		if err != nil {
+			return err
+		}
+	}
+
+	indexFileName := fmt.Sprintf("%s%s", args[0], ".gob")
+	indexPath := filepath.Join(indexDir, indexFileName)
+	file, err := os.OpenFile(indexPath, os.O_RDWR|os.O_CREATE, 0644)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	_, err = file.Write(indexGob.Bytes())
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func commandSearch(config *Config, args []string) error {
 	if len(args) < 2 {
 		return fmt.Errorf("search expects a source and a query")
@@ -121,6 +171,12 @@ func getCommands() map[string]Command {
 			description: "Prints the list of commands",
 			usage:       "scry help [subcommand]",
 			callback:    commandHelp,
+		},
+		"index": {
+			name:        "index",
+			description: "Create an index from the given source",
+			usage:       "scry index <source>",
+			callback:    commandIndex,
 		},
 		"search": {
 			name:        "search",
