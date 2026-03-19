@@ -8,8 +8,11 @@ According to the [Slay the Spire Fandom Wiki](https://slay-the-spire.fandom.com/
 > You then may choose to discard any number of them.
 
 You see, I was playing slay the spire on the plane and I need to look up a keyword, but I have no internet.
-And I need to look up the wiki so frequently on some of the more wiki based games like DnDs and strategy games, the web interface literally slows me down.
+And sometimes I need to look up the wiki so frequently on some of the more wiki based games like DnDs and strategy games, the web interface literally slows me down.
 So I did what any developer would have done: I wrote my own scarper and search engine.
+
+Just like the mechanic, Scry scrapes wiki pages to your filesystem, and let you query against them.
+The idea is to be modular that I can write custom scrapers, fine tune the searching algorithm, and use it anywhere.
 Now I can take the wiki with me offline, even port it to any front end I want, for any game.
 
 ## Architecture
