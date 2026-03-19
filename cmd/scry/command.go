@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"path/filepath"
 	"strconv"
 	"strings"
 
@@ -12,6 +13,7 @@ import (
 )
 
 type Config struct {
+	Root string
 }
 
 type Command struct {
@@ -66,7 +68,8 @@ func commandSearch(config *Config, args []string) error {
 	if len(args) < 2 {
 		return fmt.Errorf("search expects a source and a query")
 	}
-	sourcePath := args[0]
+	source := fmt.Sprintf("%s%s", args[0], ".jsonl")
+	sourcePath := filepath.Join(config.Root, "data", source)
 	query := strings.Join(args[1:], " ")
 	numResult := 10
 
