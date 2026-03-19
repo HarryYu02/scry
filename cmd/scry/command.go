@@ -128,7 +128,26 @@ func commandSearch(config *Config, args []string) error {
 		return err
 	}
 
-	docs, err := indexer.Search(sourceDocs, query, numResult)
+	indexFileName := fmt.Sprintf("%s%s", args[0], ".gob")
+	indexPath := filepath.Join(config.Root, "index", indexFileName)
+	indexContent, err := os.ReadFile(indexPath)
+	if err != nil {
+		return err
+	}
+
+	var b bytes.Buffer
+	_, err = b.Write(indexContent)
+	if err != nil {
+		return err
+	}
+	dec := gob.NewDecoder(&b)
+	var index indexer.TermFreqIndex
+	err = dec.Decode(&index)
+	if err != nil {
+		return err
+	}
+
+	docs, err := indexer.Search(sourceDocs, &index, query, numResult)
 	if err != nil {
 		return err
 	}

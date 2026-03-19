@@ -57,14 +57,9 @@ func calculateInverseDocFreq(term string, index *TermFreqIndex) float64 {
 	return math.Log10(numDocs / numDocsHaveTerm)
 }
 
-func Search(source []Document, query string, count int) ([]Document, error) {
+func Search(source []Document, index *TermFreqIndex, query string, count int) ([]Document, error) {
 	if len(source) == 0 {
 		return nil, fmt.Errorf("Search expects len(source) > 0")
-	}
-
-	index, err := Index(source)
-	if err != nil {
-		return nil, err
 	}
 
 	terms := strings.Fields(strings.ToUpper(query))
@@ -74,8 +69,8 @@ func Search(source []Document, query string, count int) ([]Document, error) {
 
 	tfidfMap := make(map[string]float64)
 	for _, term := range terms {
-		idf := calculateInverseDocFreq(term, &index)
-		for id, termFreq := range index {
+		idf := calculateInverseDocFreq(term, index)
+		for id, termFreq := range *index {
 			tf := calculateTermFreq(term, &termFreq)
 			tfidfMap[id] += (tf * idf)
 		}
