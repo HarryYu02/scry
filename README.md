@@ -1,5 +1,6 @@
 # Scry
 Scry is a modular, offline-first, terminal-native search engine written in Go and Python.
+This is a mono-repo for both the Python scraper, the Go indexer, and the Go cli.
 
 ## Motivation
 According to the [Slay the Spire Fandom Wiki](https://slay-the-spire.fandom.com/wiki/Scry):
@@ -10,6 +11,14 @@ You see, I was playing slay the spire on the plane and I need to look up a keywo
 And I need to look up the wiki so frequently on some of the more wiki based games like DnDs and strategy games, the web interface literally slows me down.
 So I did what any developer would have done: I wrote my own scarper and search engine.
 Now I can take the wiki with me offline, even port it to any front end I want, for any game.
+
+## Architecture
+The Scry project is split into three independent components:
+1. **Scry Scraper (scraper/):** Downloads wiki pages and compiles them into a `.jsonl` dataset.
+2. **Scry Lib (internal/):** An internal library that builds TF-IDF indexes and search from that dataset.
+3. **Scry CLI (cmd/scry/):** A CLI front end for user interaction.
+
+The scraped data and indexes are stored at `$HOME/.local/share/scry`.
 
 ## Quick Start
 There is no release for the app yet, so you will need to clone the repo and run the cli from the root of the project.
