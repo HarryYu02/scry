@@ -7,7 +7,7 @@ import (
 
 func main() {
 	if len(os.Args) < 2 {
-		fmt.Printf("err: command not found\n")
+		fmt.Printf("ERROR: command not found\n")
 		os.Exit(1)
 	}
 	cmd := os.Args[1]

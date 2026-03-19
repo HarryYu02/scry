@@ -10,6 +10,7 @@ from ..base_scraper import BaseScraper
 class STSFandomScraper(BaseScraper):
     def __init__(self):
         super().__init__()
+        self.name: str = "stsfandom"
         self.prefix: str = "stsfandom"
         self.base_url: str = "https://slay-the-spire.fandom.com"
         self.site_map: str = "https://slay-the-spire.fandom.com/wiki/Local_Sitemap"
