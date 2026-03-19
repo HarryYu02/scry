@@ -46,12 +46,14 @@ It will take a while.
 ### 3. Run the cli
 ```bash
 cd ..
+go run ./cmd/scry index stsfandom
 go run ./cmd/scry search stsfandom "watcher scry"
 ```
 
 ## Usage
 Available commands:
 - help
+- index
 - search
 
 ## Contributing
@@ -76,6 +78,7 @@ It will take a while.
 ### 3. Run the cli
 ```bash
 cd ..
+go run ./cmd/scry index stsfandom
 go run ./cmd/scry search stsfandom "watcher scry"
 ```
 
