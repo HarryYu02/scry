@@ -87,3 +87,6 @@ If you'd like to contribute, please fork the repository and open a pull request 
 
 ## Resources
 - [TF-IDF (Term Frequency-Inverse Document Frequency)](https://en.wikipedia.org/wiki/Tf%E2%80%93idf)
+- [Levenshtein distance](https://en.wikipedia.org/wiki/Levenshtein_distance)
+- [Porter Stemmer algorithm](https://en.wikipedia.org/wiki/Stemming)
+- [ANSI escape code](https://en.wikipedia.org/wiki/ANSI_escape_code)
