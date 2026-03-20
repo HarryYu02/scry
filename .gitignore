@@ -49,8 +49,3 @@ venv/
 build/
 dist/
 *.egg-info/
-
-# --- Project Specific Data ---
-# Ignore raw scrapes and compiled indexes
-*.jsonl
-*.gob
