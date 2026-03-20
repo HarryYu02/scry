@@ -8,6 +8,7 @@ import (
 
 
 const ROOT_PATH = "~/.local/share/scry"
+const MAX_BUF_SIZE = 10 * 1024 * 1024 // 10MB
 
 func main() {
 	if len(os.Args) < 2 {
@@ -29,6 +30,7 @@ func main() {
 
 	config := &Config{
 		Root: root,
+		MaxBufSize: MAX_BUF_SIZE,
 	}
 
 	commands := getCommands()

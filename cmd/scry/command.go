@@ -15,7 +15,8 @@ import (
 )
 
 type Config struct {
-	Root string
+	Root       string
+	MaxBufSize int
 }
 
 type Command struct {
@@ -53,6 +54,11 @@ func readDocs(path string) ([]indexer.Document, error) {
 
 	sourceDocs := make([]indexer.Document, 0)
 	fileScanner := bufio.NewScanner(file)
+
+	const maxCapacity = 10 * 1024 * 1024 // 10 MB
+	buf := make([]byte, bufio.MaxScanTokenSize)
+	fileScanner.Buffer(buf, maxCapacity)
+
 	for fileScanner.Scan() {
 		docBytes := fileScanner.Bytes()
 		var docContent indexer.Document
@@ -61,6 +67,10 @@ func readDocs(path string) ([]indexer.Document, error) {
 			return nil, err
 		}
 		sourceDocs = append(sourceDocs, docContent)
+	}
+
+	if err := fileScanner.Err(); err != nil {
+		return nil, err
 	}
 
 	return sourceDocs, nil
