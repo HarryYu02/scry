@@ -24,30 +24,31 @@ The Scry project is split into three independent components:
 The scraped data and indexes are stored at `$HOME/.local/share/scry`.
 
 ## Quick Start
-There is no release for the app yet, so you will need to clone the repo and run the cli from the root of the project.
 
-### Dependencies
-- go >= 1.25
-- uv >= 0.9
+### 1. Installation
+You only need Go installed on your system.
 
-### 1. Clone the mono-repo
 ```bash
 git clone https://github.com/HarryYu02/scry.git
 cd scry
+make install
 ```
 
-### 2. Run the scraper
-```bash
-cd scraper
-uv run main.py
-```
-It will take a while.
+It will install to $HOME/.local/bin, make sure $HOME/.local/bin is in your $PATH.
 
-### 3. Run the cli
+### 2. Getting wiki data
+You can always write your custom scraper class and scrape the data,
+but I have included an example dataset in examples/.
+
 ```bash
-cd ..
-go run ./cmd/scry index stsfandom
-go run ./cmd/scry search stsfandom "watcher scry"
+mkdir -p $HOME/.local/share/scry/data
+cp examples/demo.jsonl $HOME/.local/share/scry/data
+```
+
+### 3. Try it out
+```bash
+scry index demo
+scry search demo "healing"
 ```
 
 ## Usage
@@ -61,19 +62,19 @@ Available commands:
 - go >= 1.25
 - uv >= 0.9
 
-### 1. Clone the mono-repo
+### 1. Fork and clone the mono-repo
 ```bash
-git clone https://github.com/HarryYu02/scry.git
+gh repo fork https://github.com/HarryYu02/scry.git
+git clone https://github.com/<username>/scry.git
 cd scry
 ```
 
 ### 2. Run the scraper
 ```bash
 cd scraper
-mkdir data
-uv run main.py
+uv run main.py stsfandom
 ```
-It will take a while.
+It will take a while (about 5 minutes on my laptop).
 
 ### 3. Run the cli
 ```bash
