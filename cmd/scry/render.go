@@ -8,10 +8,10 @@ import (
 	"strings"
 )
 
-
 const ANSIReset = "\033[0m"
 
 type ANSIFormat int
+
 const (
 	Regular ANSIFormat = iota
 	Bold
@@ -26,6 +26,7 @@ const (
 )
 
 type ANSIColor int
+
 const (
 	Black ANSIColor = 30 + iota
 	Red

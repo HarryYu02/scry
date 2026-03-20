@@ -12,7 +12,6 @@ import (
 	"github.com/HarryYu02/scry/internal/indexer"
 )
 
-
 func commandSearch(config *Config, args []string) error {
 	if len(args) < 2 {
 		return fmt.Errorf("search expects a source and a query")
@@ -84,4 +83,3 @@ func commandSearch(config *Config, args []string) error {
 
 	return nil
 }
-

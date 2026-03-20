@@ -6,7 +6,6 @@ import (
 	"strings"
 )
 
-
 const ROOT_PATH = "~/.local/share/scry"
 const MAX_BUF_SIZE = 10 * 1024 * 1024 // 10MB
 
@@ -29,7 +28,7 @@ func main() {
 	}
 
 	config := &Config{
-		Root: root,
+		Root:       root,
 		MaxBufSize: MAX_BUF_SIZE,
 	}
 

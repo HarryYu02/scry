@@ -2,7 +2,6 @@ package main
 
 import "fmt"
 
-
 func commandHelp(config *Config, args []string) error {
 	fmt.Println("")
 	fmt.Println("Scry is a modular, offline-first, terminal-native search engine.")
@@ -21,4 +20,3 @@ func commandHelp(config *Config, args []string) error {
 
 	return nil
 }
-

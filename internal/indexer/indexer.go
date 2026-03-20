@@ -5,11 +5,17 @@ import (
 	"math"
 	"sort"
 	"strings"
-
-	"github.com/HarryYu02/scry/internal/parser"
 )
 
-type Document = parser.Document
+type Document struct {
+	ID      string   `json:"id"`
+	Source  string   `json:"source"`
+	Title   string   `json:"title"`
+	Content string   `json:"content"`
+	URL     string   `json:"url,omitempty"`
+	Tags    []string `json:"tags,omitempty"`
+}
+
 type TermFreq = map[string]int
 type TermFreqIndex = map[string]TermFreq
 
@@ -17,7 +23,7 @@ func Index(source []Document) (TermFreqIndex, error) {
 	tokenFreqIndex := make(TermFreqIndex)
 	for _, doc := range source {
 		tokenFreqMap := make(TermFreq)
-		lexer := parser.NewLexer(doc.Content)
+		lexer := newLexer(doc.Content)
 		for lexer.Cursor < len(lexer.Content) {
 			token := strings.ToUpper(lexer.NextToken())
 			if len(token) == 0 {

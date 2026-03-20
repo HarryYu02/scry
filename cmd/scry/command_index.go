@@ -10,7 +10,6 @@ import (
 	"github.com/HarryYu02/scry/internal/indexer"
 )
 
-
 func commandIndex(config *Config, args []string) error {
 	if len(args) < 1 {
 		return fmt.Errorf("index expects a source")
@@ -58,4 +57,3 @@ func commandIndex(config *Config, args []string) error {
 
 	return nil
 }
-

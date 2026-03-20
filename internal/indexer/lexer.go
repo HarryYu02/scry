@@ -1,28 +1,18 @@
-package parser
+package indexer
 
 import (
-	// "fmt"
 	"strings"
 	"unicode"
 )
 
-type Document struct {
-	ID      string   `json:"id"`
-	Source  string   `json:"source"`
-	Title   string   `json:"title"`
-	Content string   `json:"content"`
-	URL     string   `json:"url,omitempty"`
-	Tags    []string `json:"tags,omitempty"`
-}
-
-type Lexer struct {
+type lexer struct {
 	Content string
 	Cursor  int
 }
 
-func NewLexer(content string) *Lexer {
+func newLexer(content string) *lexer {
 	preparedContent := strings.TrimSpace(content)
-	return &Lexer{
+	return &lexer{
 		Content: preparedContent,
 		Cursor:  0,
 	}
@@ -44,7 +34,7 @@ func isWhiteSpace(c byte) bool {
 	return unicode.IsSpace(rune(c))
 }
 
-func (l *Lexer) NextToken() string {
+func (l *lexer) NextToken() string {
 	for isWhiteSpace(l.Content[l.Cursor]) {
 		l.Cursor++
 	}
