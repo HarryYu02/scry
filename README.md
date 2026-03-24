@@ -38,17 +38,20 @@ It will install to $HOME/.local/bin, make sure $HOME/.local/bin is in your $PATH
 
 ### 2. Getting wiki data
 You can always write your custom scraper class and scrape the data,
-but I have included an example dataset in examples/.
+but I have included some example datasets in the [release](https://github.com/HarryYu02/scry/releases/tag/v1.0.0)
 
+Download the attached .jsonl.gz files from the release.
+Then unzip and move the downloaded datasets to your local data directory:
 ```bash
-mkdir -p $HOME/.local/share/scry/data
-cp examples/demo.jsonl $HOME/.local/share/scry/data
+gunzip *.jsonl.gz
+mkdir -p ~/.local/share/scry/data
+mv *.jsonl ~/.local/share/scry/data/
 ```
 
 ### 3. Try it out
 ```bash
-scry index demo
-scry search demo "healing"
+scry index stsfandom
+scry search stsfandom "watcher scry"
 ```
 
 ## Usage
