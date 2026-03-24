@@ -78,6 +78,7 @@ cd scraper
 uv run main.py stsfandom
 ```
 It will take a while (about 5 minutes on my laptop).
+See [scry-scraper](https://github.com/HarryYu02/scry/blob/main/scraper/README.md) for how to implement your custom scraper.
 
 ### 3. Run the cli
 ```bash

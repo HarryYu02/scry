@@ -24,5 +24,14 @@ scrape the target site, and output a raw JSONL file to the system data directory
 
 1. Create a new directory under sources/ (e.g., sources/mywiki/).
 2. Implement a scraper.py class that inherits from BaseScraper.
-3. Ensure you exclude .mw-redirect classes in your CSS selectors to avoid indexing typo/redirect pages.
-4. Register the new source in sources/\_\_init\_\_.py.
+3. Register the new source in sources/\_\_init\_\_.py.
+
+```python
+# ...
+from .mywiki import MyWikiScraper
+
+scrapers = {
+    # ...
+    "mywiki":    MyWikiScraper,
+}
+```
