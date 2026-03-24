@@ -1,7 +1,7 @@
 [project]
-name = "scraper"
+name = "scryscraper"
 version = "0.1.0"
-description = "Add your description here"
+description = "An extensible scraper for scry"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
@@ -10,3 +10,10 @@ dependencies = [
     "html2text>=2025.4.15",
     "requests>=2.32.5",
 ]
+
+[project.scripts]
+scry-scraper = "main:main"
+
+[tool.setuptools]
+packages = { find = { where = ["."] } }
+py-modules = ["main"]

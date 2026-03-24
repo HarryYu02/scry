@@ -86,9 +86,6 @@ func Search(source []Document, index *TermFreqIndex, query string, count int) ([
 		return tfidfMap[source[j].ID] < tfidfMap[source[i].ID]
 	})
 
-	numResult := count
-	if len(source) < count {
-		numResult = len(source)
-	}
+	numResult := min(len(source), count)
 	return source[:numResult], nil
 }

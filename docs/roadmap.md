@@ -10,11 +10,11 @@
 
 ~~5. **Prepare for release:** Add a Makefile for global binary installation.~~
 
-6. **Smarter search:** Implement basic stemming and Levenshtein distance for fuzzy matching in the Go backend.
+6. **Developer UX & Make Targets**: Add a shell wrapper with a shebang and dedicated make targets (like make scrape) so maintainers don't have to manually invoke uv run to test the pipeline.
 
-7. **Concurrent Ingestion**: Refactor the Python scraper using asyncio or ThreadPoolExecutor to parallelize document downloads and drastically cut down that 2-hour BG3 scrape time.
+7. **Smarter search:** Implement basic stemming and Levenshtein distance for fuzzy matching in the Go backend.
 
-8. **Developer UX & Make Targets**: Add a shell wrapper with a shebang and dedicated make targets (like make scrape) so maintainers don't have to manually invoke uv run to test the pipeline.
+8. **Concurrent Ingestion**: Refactor the Python scraper using asyncio or ThreadPoolExecutor to parallelize document downloads and drastically cut down that 2-hour BG3 scrape time.
 
 9. **Custom Scraper Documentation**: Write a clear tutorial in docs/ detailing how contributors can inherit from the base Python scraper class to add support for their own game wikis.
 
