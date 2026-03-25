@@ -5,10 +5,10 @@ description = "An extensible scraper for scry"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
+    "aiohttp>=3.13.3",
     "beautifulsoup4>=4.14.3",
     "brotli>=1.2.0",
     "html2text>=2025.4.15",
-    "requests>=2.32.5",
 ]
 
 [project.scripts]

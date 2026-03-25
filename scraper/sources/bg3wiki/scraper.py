@@ -31,10 +31,12 @@ class BG3WikiScraper(BaseScraper):
         )
 
     @override
-    def _get_all_page_links(self) -> list[str]:
-        soup = self._get_page_soup(self.site_map)
-        output: list[str] = []
+    async def _get_all_page_urls(self) -> None:
+        page_url = self.base_url
         while True:
+            soup = await self._get_page_soup(page_url)
+            if soup == None:
+                return
             content_div = soup.find(id="mw-content-text")
             if content_div == None:
                 continue
@@ -46,13 +48,12 @@ class BG3WikiScraper(BaseScraper):
                 classes = link.get("class")
                 if classes != None and "mw-redirect" in classes:
                     continue
-                output.append(self.base_url + href)
+                async with self.lock:
+                    self.page_urls.append(self.base_domain + href)
             next_link = soup.find("a", text=re.compile("^Next page"))
             if next_link == None:
                 break
-            next_url = self.base_url + str(next_link.get("href"))
-            soup = self._get_page_soup(next_url)
-        return output
+            page_url = self.base_domain + str(next_link.get("href"))
 
     @override
     def _get_title_from_soup(self, soup: BeautifulSoup) -> str:
