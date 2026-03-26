@@ -46,7 +46,7 @@ async def display_loading_state(s: base_scraper.BaseScraper):
         stats["last_count"] = completed
         await asyncio.sleep(1 / FPS)
 
-async def main():
+async def async_main():
     if len(sys.argv) < 2:
         print_error_and_exit("ERROR: missing argument: expect a source")
 
@@ -75,9 +75,7 @@ async def main():
             stats["count"] += 1
             stats["errors"] += 1
 
-        _ = sys.stderr.write("\033[?25l")
         page_contents = await s.fetch(on_success=on_success, on_failed=on_failed)
-        _ = sys.stderr.write("\033[?25h")
         _ = sys.stderr.write(
             f"\r\033[KScraped {s.name}: {stats['count']} pages successfully" +
             f" ({stats['errors']} failed)\n"
@@ -91,5 +89,8 @@ async def main():
         _ = loading_ui.cancel()
 
 
+def main():
+    asyncio.run(async_main())
+
 if __name__ == "__main__":
-    asyncio.run(main())
+    main()
