@@ -20,7 +20,7 @@
 
 ~~9. **Concurrent Ingestion**: Refactor the Python scraper using asyncio or ThreadPoolExecutor to parallelize document downloads and drastically cut down that 2-hour BG3 scrape time.~~
 
-10. **Scry-Scraper UI Polish:** Implement a minimalist stdout progress spinner/bar for long I/O jobs and clean up terminal logging to prevent raw HTML dumps on failed requests.
+~~10. **Scry-Scraper UI Polish:** Implement a minimalist stdout progress spinner/bar for long I/O jobs and clean up terminal logging to prevent raw HTML dumps on failed requests.~~
 
 11. **Custom Scraper Documentation**: Write a clear tutorial in docs/ detailing how contributors can inherit from the base Python scraper class to add support for their own game wikis.
 

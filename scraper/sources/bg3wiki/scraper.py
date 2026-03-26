@@ -27,7 +27,7 @@ class BG3WikiScraper(BaseScraper):
                 "Priority": "u=0, i",
                 "Pragma": "no-cache",
                 "Cache-Control": "no-cache",
-            }
+            },
         )
 
     @override

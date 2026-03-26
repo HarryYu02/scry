@@ -7,6 +7,7 @@ import aiohttp
 from bs4 import BeautifulSoup
 import html2text
 
+
 class Page(TypedDict):
     id: str
     source: str
@@ -15,11 +16,14 @@ class Page(TypedDict):
     url: str
     tags: list[str]
 
-class BaseScraper():
+
+class BaseScraper:
     page_urls: list[str] = []
     page_data: dict[str, Page] = {}
 
-    def __init__(self, name: str, base_domain: str, base_url: str, headers: dict[str, str]):
+    def __init__(
+        self, name: str, base_domain: str, base_url: str, headers: dict[str, str]
+    ):
         self.name: str = name
         self.base_domain: str = base_domain
         self.base_url: str = base_url
@@ -80,8 +84,8 @@ class BaseScraper():
     async def _get_page_content(
         self,
         url: str,
-        on_success: Callable[[str],None] | None=None,
-        on_failed: Callable[[str, str],None] | None=None,
+        on_success: Callable[[str], None] | None = None,
+        on_failed: Callable[[str, str], None] | None = None,
     ) -> None:
         async with self.semaphore:
             if await self._is_page_visited(url):
@@ -107,21 +111,21 @@ class BaseScraper():
 
             async with self.lock:
                 self.page_data[url] = {
-                "id": f'{self.name}_{title.lower().replace(" ", "_")}',
-                "source": self.name,
-                "title": title,
-                "content": self._html_to_md(main),
-                "url": url,
-                "tags": []
-            }
+                    "id": f"{self.name}_{title.lower().replace(' ', '_')}",
+                    "source": self.name,
+                    "title": title,
+                    "content": self._html_to_md(main),
+                    "url": url,
+                    "tags": [],
+                }
             if on_success:
                 on_success(url)
 
     async def _get_all_page_contents(
         self,
-        on_success: Callable[[str],None] | None=None,
-        on_failed: Callable[[str, str],None] | None=None,
-     ) -> None:
+        on_success: Callable[[str], None] | None = None,
+        on_failed: Callable[[str, str], None] | None = None,
+    ) -> None:
         tasks = [
             asyncio.create_task(self._get_page_content(url, on_success, on_failed))
             for url in self.page_urls
@@ -131,13 +135,11 @@ class BaseScraper():
 
     async def fetch(
         self,
-        on_success: Callable[[str],None] | None=None,
-        on_failed: Callable[[str, str],None] | None=None,
+        on_success: Callable[[str], None] | None = None,
+        on_failed: Callable[[str, str], None] | None = None,
     ) -> list[Page]:
         await self._get_all_page_urls()
         await self._get_all_page_contents(on_success, on_failed)
         async with self.lock:
             output = list(self.page_data.values())
             return output
-
-

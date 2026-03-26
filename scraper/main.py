@@ -18,9 +18,11 @@ stats = {
     "start_time": time.time(),
 }
 
+
 def print_error_and_exit(err: str) -> NoReturn:
     print(err, file=sys.stderr)
     sys.exit(1)
+
 
 async def display_loading_state(s: base_scraper.BaseScraper):
     stats["start_time"] = time.time()
@@ -37,14 +39,15 @@ async def display_loading_state(s: base_scraper.BaseScraper):
         eta_str = f"{int(eta_seconds // 60):02d}m{int(eta_seconds % 60):02d}s"
 
         _ = sys.stderr.write(
-            f"\r[{spinning_wheel}] Scraping {s.name}... {completed}/{total_pages} ({process_percent}%)" +
-            f" | {req_per_sec} req/s" +
-            f" | ETA: {eta_str}" +
-            f" | Err: {stats['errors']}\033[K"
+            f"\r[{spinning_wheel}] Scraping {s.name}... {completed}/{total_pages} ({process_percent}%)"
+            + f" | {req_per_sec} req/s"
+            + f" | ETA: {eta_str}"
+            + f" | Err: {stats['errors']}\033[K"
         )
         _ = sys.stderr.flush()
         stats["last_count"] = completed
         await asyncio.sleep(1 / FPS)
+
 
 async def async_main():
     if len(sys.argv) < 2:
@@ -64,7 +67,6 @@ async def async_main():
     if Scraper == None:
         print_error_and_exit("ERROR: unknown source: scraper not available")
 
-
     async with Scraper() as s:
         loading_ui = asyncio.create_task(display_loading_state(s))
 
@@ -77,8 +79,8 @@ async def async_main():
 
         page_contents = await s.fetch(on_success=on_success, on_failed=on_failed)
         _ = sys.stderr.write(
-            f"\r\033[KScraped {s.name}: {stats['count']} pages successfully" +
-            f" ({stats['errors']} failed)\n"
+            f"\r\033[KScraped {s.name}: {stats['count']} pages successfully"
+            + f" ({stats['errors']} failed)\n"
         )
 
         output_path = os.path.join(data_dir_path, s.name + ".jsonl")
@@ -91,6 +93,7 @@ async def async_main():
 
 def main():
     asyncio.run(async_main())
+
 
 if __name__ == "__main__":
     main()
