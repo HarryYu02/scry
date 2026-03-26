@@ -1,5 +1,5 @@
 import asyncio
-from typing import TypedDict
+from typing import TypedDict, Callable
 from urllib.parse import urlparse, urlunparse, quote, unquote
 from yarl import URL
 
@@ -16,14 +16,15 @@ class Page(TypedDict):
     tags: list[str]
 
 class BaseScraper():
+    page_urls: list[str] = []
+    page_data: dict[str, Page] = {}
+
     def __init__(self, name: str, base_domain: str, base_url: str, headers: dict[str, str]):
         self.name: str = name
         self.base_domain: str = base_domain
         self.base_url: str = base_url
         self.headers: dict[str, str] = headers
 
-        self.page_urls: list[str] = []
-        self.page_data: dict[str, Page] = {}
         self.lock: asyncio.Lock = asyncio.Lock()
         self.max_concurrency: int = 5
         self.semaphore: asyncio.Semaphore = asyncio.Semaphore(self.max_concurrency)
@@ -33,12 +34,7 @@ class BaseScraper():
         self.session = aiohttp.ClientSession()
         return self
 
-    async def __aexit__(
-        self,
-        exc_type,
-        exc_val,
-        exc_tb,
-    ):
+    async def __aexit__(self, exc_type, exc_val, exc_tb):  # pyright: ignore[reportUnknownParameterType, reportMissingParameterType]
         await self.session.close()
 
     def _normalize_url(self, url: str) -> str:
@@ -81,23 +77,32 @@ class BaseScraper():
     def _get_content_from_soup(self, soup: BeautifulSoup) -> str:  # pyright: ignore[reportUnusedParameter]
         raise NotImplementedError("Scraper must implement _get_content_from_soup()")
 
-    async def _get_page_content(self, url: str) -> None:
+    async def _get_page_content(
+        self,
+        url: str,
+        on_success: Callable[[str],None] | None=None,
+        on_failed: Callable[[str, str],None] | None=None,
+    ) -> None:
         async with self.semaphore:
             if await self._is_page_visited(url):
-                print(f"already visited ({url})")
+                if on_failed:
+                    on_failed(url, "already visited")
                 return
 
             soup = await self._get_page_soup(url)
             if soup == None:
-                print(f"failed ({url})")
+                if on_failed:
+                    on_failed(url, "page not found")
                 return
             title = self._get_title_from_soup(soup)
             if len(title) == 0:
-                print(f"failed ({url})")
+                if on_failed:
+                    on_failed(url, "page title not found")
                 return
             main = self._get_content_from_soup(soup)
             if len(main) == 0:
-                print(f"failed ({url})")
+                if on_failed:
+                    on_failed(url, "page content not found")
                 return
 
             async with self.lock:
@@ -109,23 +114,30 @@ class BaseScraper():
                 "url": url,
                 "tags": []
             }
-            print(f"success ({url})")
+            if on_success:
+                on_success(url)
 
-    async def _get_all_page_contents(self) -> None:
+    async def _get_all_page_contents(
+        self,
+        on_success: Callable[[str],None] | None=None,
+        on_failed: Callable[[str, str],None] | None=None,
+     ) -> None:
         tasks = [
-            asyncio.create_task(self._get_page_content(url))
+            asyncio.create_task(self._get_page_content(url, on_success, on_failed))
             for url in self.page_urls
         ]
         if tasks:
             _ = await asyncio.gather(*tasks)
 
-    async def fetch(self) -> list[Page]:
+    async def fetch(
+        self,
+        on_success: Callable[[str],None] | None=None,
+        on_failed: Callable[[str, str],None] | None=None,
+    ) -> list[Page]:
         await self._get_all_page_urls()
-        await self._get_all_page_contents()
+        await self._get_all_page_contents(on_success, on_failed)
         async with self.lock:
             output = list(self.page_data.values())
-            print(f"found {len(self.page_urls)} pages.")
-            print(f"scraped {len(output)} pages successfully.")
             return output
 
 
