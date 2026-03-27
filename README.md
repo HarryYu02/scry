@@ -68,7 +68,7 @@ Please see [contribute](https://github.com/HarryYu02/scry/blob/main/docs/contrib
 
 ## Resources
 - [TF-IDF (Term Frequency-Inverse Document Frequency)](https://en.wikipedia.org/wiki/Tf%E2%80%93idf)
-- ~~[Levenshtein distance](https://en.wikipedia.org/wiki/Levenshtein_distance)~~
+- [Levenshtein distance](https://en.wikipedia.org/wiki/Levenshtein_distance)
 - [Damerau–Levenshtein distance](https://en.wikipedia.org/wiki/Damerau%E2%80%93Levenshtein_distance)
 - [Porter Stemmer algorithm](https://en.wikipedia.org/wiki/Stemming)
 - [ANSI escape code](https://en.wikipedia.org/wiki/ANSI_escape_code)

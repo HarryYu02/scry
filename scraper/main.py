@@ -79,7 +79,7 @@ async def async_main():
 
         page_contents = await s.fetch(on_success=on_success, on_failed=on_failed)
         _ = sys.stderr.write(
-            f"\r\033[KScraped {s.name}: {stats['count']} pages successfully"
+            f"\r\033[KScraped {s.name}: {len(page_contents)} pages successfully"
             + f" ({stats['errors']} failed)\n"
         )
 
