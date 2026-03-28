@@ -1,6 +1,11 @@
 package indexer
 
-func levenshteinDist(source, target string) int {
+import (
+	"fmt"
+	"math"
+)
+
+func calcLevenshteinDist(source, target string) int {
 	dpRowNum := len(source) + 1
 	dpColNum := len(target) + 1
 	dp := make([][]int, dpRowNum)
@@ -33,3 +38,30 @@ func levenshteinDist(source, target string) int {
 
 	return dp[len(source)][len(target)]
 }
+
+func findClosestTerm(wordFreq *map[string]int, term string) (string, error) {
+	if len(*wordFreq) == 0 {
+		return "", fmt.Errorf("findClosestTerm() expects wordFreq to be non-empty")
+	}
+	if len(term) == 0 {
+		return "", fmt.Errorf("findClosestTerm() expects term to be non-empty")
+	}
+	closestWord := ""
+	minLevDist := math.MaxInt
+	closestWordFreq := 0
+	for word, freq := range *wordFreq {
+		levDist := calcLevenshteinDist(word, term)
+		if levDist < minLevDist {
+			closestWord = word
+			minLevDist = levDist
+			closestWordFreq = freq
+		} else if levDist == minLevDist && freq > closestWordFreq {
+			// tie breaker
+			closestWord = word
+			minLevDist = levDist
+			closestWordFreq = freq
+		}
+	}
+	return closestWord, nil
+}
+
