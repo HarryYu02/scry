@@ -44,9 +44,9 @@ func TestLevenshteinDist(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			result := levenshteinDist(test.a, test.b)
+			result := calcLevenshteinDist(test.a, test.b)
 			if result != test.expected {
-				t.Errorf("levenshteinDist(%s, %s) = %d, expected %d", test.a, test.b, result, test.expected)
+				t.Errorf("levenshteinDist(%s, %s) = %d, expected %d\n", test.a, test.b, result, test.expected)
 			}
 		})
 	}
