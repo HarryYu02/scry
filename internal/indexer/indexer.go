@@ -73,7 +73,7 @@ func Search(source []Document, index *TermFreqIndex, query string, count int) ([
 		return nil, fmt.Errorf("Search expects query contains non-whitespace character")
 	}
 
-	// TODO: create wordFreq on index
+	// TODO: move this step to index
 	// wordFreq is the map of all unique words (in all the documents) and their total frequency
 	wordFreq := make(map[string]int)
 	stemmedIndex := make(TermFreqIndex)
@@ -98,6 +98,10 @@ func Search(source []Document, index *TermFreqIndex, query string, count int) ([
 	i := 0
 	for i < len(correctedTerms) {
 		term := correctedTerms[i]
+		if isStopWord(term) {
+			i++
+			continue
+		}
 		_, ok := wordFreq[term]
 		if ok {
 			stemmedTerm, err := stem(term)
