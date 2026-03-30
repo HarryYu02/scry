@@ -7,6 +7,9 @@
 *.dylib
 bin/
 
+# Profiler
+*.prof
+
 # Test binary, built with `go test -c`
 *.test
 

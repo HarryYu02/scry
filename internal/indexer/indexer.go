@@ -17,23 +17,39 @@ type Document struct {
 }
 
 type TermFreq = map[string]int
-type TermFreqIndex = map[string]TermFreq
+type TermFreqIndex struct {
+	StemmedIDTFMap map[string]TermFreq
+	AllTFMap       TermFreq
+}
 
 func Index(source []Document) (TermFreqIndex, error) {
-	tokenFreqIndex := make(TermFreqIndex)
+	index := TermFreqIndex{
+		StemmedIDTFMap: make(map[string]TermFreq),
+		AllTFMap: make(TermFreq),
+	}
+	allTFMap := make(TermFreq)
 	for _, doc := range source {
-		tokenFreqMap := make(TermFreq)
+		stemmedTFMap := make(TermFreq)
 		lexer := newLexer(doc.Content)
 		for lexer.Cursor < len(lexer.Content) {
 			token := strings.ToUpper(lexer.NextToken())
+			if isStopWord(token) {
+				continue
+			}
+			stemmedToken, err := stem(token)
+			if err != nil {
+				return TermFreqIndex{}, err
+			}
 			if len(token) == 0 {
 				break
 			}
-			tokenFreqMap[token]++
+			allTFMap[token]++
+			stemmedTFMap[stemmedToken]++
 		}
-		tokenFreqIndex[doc.ID] = tokenFreqMap
+		index.StemmedIDTFMap[doc.ID] = stemmedTFMap
 	}
-	return tokenFreqIndex, nil
+	index.AllTFMap = allTFMap
+	return index, nil
 }
 
 func calcTermFreq(term string, termFreq *TermFreq) float64 {
@@ -49,7 +65,7 @@ func calcTermFreq(term string, termFreq *TermFreq) float64 {
 	return termCount / totalTerms
 }
 
-func calcInverseDocFreq(term string, index *TermFreqIndex) float64 {
+func calcInverseDocFreq(term string, index *map[string]TermFreq) float64 {
 	numDocs := float64(len(*index))
 	numDocsHaveTerm := 0.0
 	for _, termFreq := range *index {
@@ -72,25 +88,6 @@ func Search(source []Document, index *TermFreqIndex, query string, count int) ([
 	if len(terms) == 0 {
 		return nil, fmt.Errorf("Search expects query contains non-whitespace character")
 	}
-
-	// TODO: move this step to index
-	// wordFreq is the map of all unique words (in all the documents) and their total frequency
-	wordFreq := make(map[string]int)
-	stemmedIndex := make(TermFreqIndex)
-	for id, termFreq := range *index {
-		for term, freq := range termFreq {
-			wordFreq[term] += freq
-			stemmed, err := stem(term)
-			if err != nil {
-				return nil, err
-			}
-			if _, ok := stemmedIndex[id]; !ok {
-				stemmedIndex[id] = make(TermFreq)
-			}
-			stemmedIndex[id][stemmed] += freq
-		}
-	}
-
 	correctedTerms := make([]string, len(terms))
 	_ = copy(correctedTerms, terms)
 
@@ -102,21 +99,20 @@ func Search(source []Document, index *TermFreqIndex, query string, count int) ([
 			i++
 			continue
 		}
-		_, ok := wordFreq[term]
-		if ok {
+		if _, ok := index.AllTFMap[term]; ok {
 			stemmedTerm, err := stem(term)
-			idf := calcInverseDocFreq(stemmedTerm, &stemmedIndex)
+			idf := calcInverseDocFreq(stemmedTerm, &index.StemmedIDTFMap)
 			if err != nil {
 				return nil, err
 			}
-			for id, termFreq := range stemmedIndex {
+			for id, termFreq := range index.StemmedIDTFMap {
 				tf := calcTermFreq(stemmedTerm, &termFreq)
 				tfidf := tf * idf
 				tfidfMap[id] += tfidf
 			}
 			i++
 		} else {
-			closestWord, err := findClosestTerm(&wordFreq, term)
+			closestWord, err := findClosestTerm(&index.AllTFMap, term)
 			if err != nil {
 				return nil, err
 			}
