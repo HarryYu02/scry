@@ -18,21 +18,60 @@ type Document struct {
 
 type TermFreq = map[string]int
 type TermFreqIndex struct {
-	StemmedIDTFMap map[string]TermFreq
+	StemIDTFMap    map[string]map[string]float64
 	AllTFMap       TermFreq
 }
 
 func Index(source []Document) (TermFreqIndex, error) {
 	index := TermFreqIndex{
-		StemmedIDTFMap: make(map[string]TermFreq),
+		StemIDTFMap: make(map[string]map[string]float64),
 		AllTFMap: make(TermFreq),
 	}
-	allTFMap := make(TermFreq)
+
+	// total num of docs
+	numDocs := float64(len(source))
+	// stem -> num of documents it appears
+	stemDocFreqMap := make(map[string]int)
+	// doc id -> stem -> count
+	rawTFMap := make(map[string]map[string]int)
+	// doc id -> total word count in doc
+	wordCountMap := make(map[string]int)
+
 	for _, doc := range source {
-		stemmedTFMap := make(TermFreq)
 		lexer := newLexer(doc.Content)
+
 		for lexer.Cursor < len(lexer.Content) {
 			token := strings.ToUpper(lexer.NextToken())
+			if len(token) == 0 {
+				break
+			}
+			if isStopWord(token) {
+				continue
+			}
+			index.AllTFMap[token]++
+
+			stemmedToken, err := stem(token)
+			if err != nil {
+				return TermFreqIndex{}, err
+			}
+			if _, ok := rawTFMap[doc.ID]; !ok {
+				rawTFMap[doc.ID] = make(map[string]int)
+			}
+			rawTFMap[doc.ID][stemmedToken]++
+			wordCountMap[doc.ID]++
+		}
+
+		for term := range rawTFMap {
+			stemDocFreqMap[term]++
+		}
+	}
+
+	for id, tFMap := range rawTFMap {
+		for term := range tFMap {
+			token := strings.ToUpper(term)
+			if len(token) == 0 {
+				break
+			}
 			if isStopWord(token) {
 				continue
 			}
@@ -40,46 +79,33 @@ func Index(source []Document) (TermFreqIndex, error) {
 			if err != nil {
 				return TermFreqIndex{}, err
 			}
-			if len(token) == 0 {
-				break
+
+			// calc TF
+			termCount := rawTFMap[id][stemmedToken]
+			totalTerms := wordCountMap[id]
+
+			tf := 0.0
+			if totalTerms != 0 {
+				tf = float64(termCount) / float64(totalTerms)
 			}
-			allTFMap[token]++
-			stemmedTFMap[stemmedToken]++
+
+			// calc IDF
+			numDocsHaveTerm := stemDocFreqMap[stemmedToken]
+			idf := math.Log10(float64(numDocs) / float64(1 + numDocsHaveTerm)) + 1
+
+			// calc TF-IDF and save to index
+			tfidf := tf * idf
+			if _, ok := index.StemIDTFMap[stemmedToken]; !ok {
+				index.StemIDTFMap[stemmedToken] = make(map[string]float64)
+			}
+			index.StemIDTFMap[stemmedToken][id] = tfidf
 		}
-		index.StemmedIDTFMap[doc.ID] = stemmedTFMap
 	}
-	index.AllTFMap = allTFMap
+
 	return index, nil
 }
 
-func calcTermFreq(term string, termFreq *TermFreq) float64 {
-	totalTerms := 0.0
-	for _, freq := range *termFreq {
-		totalTerms += float64(freq)
-	}
-	termCount := float64((*termFreq)[term])
-
-	if totalTerms == 0 {
-		return 0.0
-	}
-	return termCount / totalTerms
-}
-
-func calcInverseDocFreq(term string, index *map[string]TermFreq) float64 {
-	numDocs := float64(len(*index))
-	numDocsHaveTerm := 0.0
-	for _, termFreq := range *index {
-		if _, ok := termFreq[term]; ok {
-			numDocsHaveTerm++
-		}
-	}
-	return math.Log10(numDocs / (1 + numDocsHaveTerm)) + 1
-}
-
-func Search(source []Document, index *TermFreqIndex, query string, count int) ([]Document, error) {
-	if len(source) == 0 {
-		return nil, fmt.Errorf("Search expects len(source) > 0")
-	}
+func Search(index *TermFreqIndex, query string, count int) ([]string, error) {
 	if count == 0 {
 		return nil, fmt.Errorf("Search expects count > 0")
 	}
@@ -91,6 +117,7 @@ func Search(source []Document, index *TermFreqIndex, query string, count int) ([
 	correctedTerms := make([]string, len(terms))
 	_ = copy(correctedTerms, terms)
 
+	// doc id -> tfidf of entire query
 	tfidfMap := make(map[string]float64)
 	i := 0
 	for i < len(correctedTerms) {
@@ -101,13 +128,10 @@ func Search(source []Document, index *TermFreqIndex, query string, count int) ([
 		}
 		if _, ok := index.AllTFMap[term]; ok {
 			stemmedTerm, err := stem(term)
-			idf := calcInverseDocFreq(stemmedTerm, &index.StemmedIDTFMap)
 			if err != nil {
 				return nil, err
 			}
-			for id, termFreq := range index.StemmedIDTFMap {
-				tf := calcTermFreq(stemmedTerm, &termFreq)
-				tfidf := tf * idf
+			for id, tfidf := range index.StemIDTFMap[stemmedTerm] {
 				tfidfMap[id] += tfidf
 			}
 			i++
@@ -120,14 +144,17 @@ func Search(source []Document, index *TermFreqIndex, query string, count int) ([
 		}
 	}
 
-	sort.SliceStable(source, func(i, j int) bool {
-		return tfidfMap[source[j].ID] < tfidfMap[source[i].ID]
+	ids := make([]string, len(tfidfMap))
+	idx := 0
+	for id := range tfidfMap {
+		ids[idx] = id
+		idx++
+	}
+
+	sort.SliceStable(ids, func(i, j int) bool {
+		return tfidfMap[ids[j]] < tfidfMap[ids[i]]
 	})
 
-	numResult := min(len(source), count)
-	// for i := range numResult {
-	// 	fmt.Printf("%s: %f\n", source[i].ID, tfidfMap[source[i].ID])
-	// }
-
-	return source[:numResult], nil
+	numResult := min(len(ids), count)
+	return ids[:numResult], nil
 }

@@ -26,6 +26,10 @@ func commandSearch(config *Config, args []string) error {
 	if err != nil {
 		return err
 	}
+	idDocMap := make(map[string]indexer.Document)
+	for _, doc := range sourceDocs {
+		idDocMap[doc.ID] = doc
+	}
 
 	indexFileName := fmt.Sprintf("%s%s", args[0], ".gob")
 	indexPath := filepath.Join(config.Root, "index", indexFileName)
@@ -46,15 +50,15 @@ func commandSearch(config *Config, args []string) error {
 		return err
 	}
 
-	docs, err := indexer.Search(sourceDocs, &index, query, numResult)
+	ids, err := indexer.Search(&index, query, numResult)
 	if err != nil {
 		return err
 	}
 
 	fmt.Printf("\nSearch query: %s\n\n", query)
 	fmt.Println("Results:")
-	for i, doc := range docs {
-		fmt.Printf("%0.2d: %s\n", i+1, doc.Title)
+	for i, id := range ids {
+		fmt.Printf("%0.2d: %s\n", i+1, idDocMap[id].Title)
 	}
 	fmt.Printf("\nSelect by typing the number 1-%d (0 to cancel)\n> ", numResult)
 	var input string
@@ -74,7 +78,7 @@ func commandSearch(config *Config, args []string) error {
 		return nil
 	}
 
-	selectedDoc := docs[choice-1]
+	selectedDoc := idDocMap[ids[choice-1]]
 	// TODO: add --stdout flag
 	err = render(selectedDoc.Content)
 	if err != nil {
