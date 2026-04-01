@@ -29,8 +29,10 @@ The scraped data and indexes are stored at `$HOME/.local/share/scry`.
 ## Quick Start
 
 ### 1. Installation
-You only need Go installed on your system for `scry`.
+Simply download the binary from the latest [release](https://github.com/HarryYu02/scry/releases).
+Optionally, you can clone the main branch for the latest version as well.
 
+you will need Go installed on your system:
 ```bash
 git clone https://github.com/HarryYu02/scry.git
 cd scry
@@ -41,14 +43,21 @@ It will install to `$HOME/.local/bin`, make sure `$HOME/.local/bin` is in your $
 
 ### 2. Getting wiki data
 You can always write your custom scraper class and scrape the data,
-but I have included some example datasets in the [release](https://github.com/HarryYu02/scry/releases/tag/v1.0.0).
+but I have included some example datasets in the [release](https://github.com/HarryYu02/scry/releases/tag/v2.0.0).
 
-Download the attached .jsonl.gz files from the release.
+Download the attached data.tar.gz files from the release.
 Then unzip and move the downloaded datasets to your local data directory:
 ```bash
-gunzip *.jsonl.gz
+tar xzf data.tar.gz
 mkdir -p ~/.local/share/scry/data
 mv *.jsonl ~/.local/share/scry/data/
+```
+
+Optionally, you can install the Python scraper and scrape the data yourself.
+You will need uv installed for `scry-scraper`:
+```bash
+make install-scraper
+scry-scraper stsfandom
 ```
 
 ### 3. Try it out
