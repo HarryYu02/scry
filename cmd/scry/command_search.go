@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"flag"
 	"io"
 	"os"
 	"path/filepath"
@@ -14,6 +15,16 @@ import (
 )
 
 func commandSearch(config *Config, args []string) error {
+	searchCmd := flag.NewFlagSet("search", flag.ExitOnError)
+	searchCmd.Usage = func() {
+		commandHelp(config, []string{"search"})
+	}
+
+	urlFlag := searchCmd.Bool("url", false, config.Commands["search"].flags["url"])
+
+	searchCmd.Parse(args)
+	args = searchCmd.Args()
+
 	if len(args) < 2 {
 		return fmt.Errorf("search expects a source and a query")
 	}
@@ -64,6 +75,9 @@ func commandSearch(config *Config, args []string) error {
 		return nil
 	}
 
+	linesToClear := len(ids) + 7
+	fmt.Printf("\033[%dA\033[J", linesToClear)
+
 	selectedID := ids[choice-1]
 	var pos Position
 	boltStore.db.View(func(tx *bolt.Tx) error {
@@ -106,6 +120,11 @@ func commandSearch(config *Config, args []string) error {
 	err = json.Unmarshal(docBytes, &doc)
 	if err != nil {
 		return err
+	}
+
+	if *urlFlag {
+		fmt.Print(doc.URL)
+		return nil
 	}
 
 	err = render(doc.Content)

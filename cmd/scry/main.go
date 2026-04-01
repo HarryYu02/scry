@@ -18,15 +18,15 @@ func main() {
 	flag.Parse()
 
 	if *cpuprofile != "" {
-        f, err := os.Create(*cpuprofile)
-        if err != nil {
+		f, err := os.Create(*cpuprofile)
+		if err != nil {
 			log.Fatal("ERROR: could not create CPU profile: ", err)
-        }
-        defer f.Close() // error handling omitted for example
-        if err := pprof.StartCPUProfile(f); err != nil {
+		}
+		defer f.Close()
+		if err := pprof.StartCPUProfile(f); err != nil {
 			log.Fatal("ERROR: could not start CPU profile: ", err)
-        }
-        defer pprof.StopCPUProfile()
+		}
+		defer pprof.StopCPUProfile()
     }
 
 	if len(flag.Args()) < 1 {
@@ -44,29 +44,29 @@ func main() {
 		root = strings.Replace(root, "~", homeDir, 1)
 	}
 
-	commands := getCommands()
-	command, ok := commands[cmd]
+	config := &Config{
+		Root:       root,
+		MaxBufSize: MAX_BUF_SIZE,
+		Commands: getCommands(),
+	}
+	command, ok := config.Commands[cmd]
 	if !ok {
 		log.Fatal("unknown command")
 	}
 
-	config := &Config{
-		Root:       root,
-		MaxBufSize: MAX_BUF_SIZE,
-	}
 	err = command.callback(config, args)
 	if err != nil {
 		log.Fatal("ERROR: error in executing command: ", err)
 	}
 
 	if *memprofile != "" {
-        f, err := os.Create(*memprofile)
-        if err != nil {
+		f, err := os.Create(*memprofile)
+		if err != nil {
 			log.Fatal("ERROR: could not create memory profile: ", err)
-        }
-        defer f.Close()
-        runtime.GC()
-        if err := pprof.Lookup("allocs").WriteTo(f, 0); err != nil {
+		}
+		defer f.Close()
+		runtime.GC()
+		if err := pprof.Lookup("allocs").WriteTo(f, 0); err != nil {
 			log.Fatal("ERROR: could not write memory profile: ", err)
         }
     }

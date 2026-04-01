@@ -11,12 +11,14 @@ import (
 type Config struct {
 	Root       string
 	MaxBufSize int
+	Commands   map[string]Command
 }
 
 type Command struct {
 	name        string
 	description string
 	usage       string
+	flags       map[string]string
 	callback    func(*Config, []string) error
 }
 
@@ -90,6 +92,11 @@ func getCommands() map[string]Command {
 			name:        "search",
 			description: "Search the query from the given source",
 			usage:       "scry search <source> <query>",
+			flags:       map[string]string{
+				"url"   : "Return the url of the search result instead",
+				// "stdout": "Pipe content of search result to stdout instead",
+				// "editor": "Pipe content of search result to be opened in $EDITOR instead",
+			},
 			callback:    commandSearch,
 		},
 	}
