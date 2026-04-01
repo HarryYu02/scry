@@ -32,6 +32,10 @@
 
 17. **Output formats:** Implement --stdout, --editor, or other flags for search to format output.
 
-18. **Help command:** Implement a more comprehensive help command for each subcommand and their flags.
+18. ~~**Help command:** Implement a more comprehensive help command for each subcommand and their flags.~~
+
+19. **Optimize searching algo:** Optimize the weight of each search term base on document's position.
+
+20. **Incremental indexing:** Only index data that has been modified.
 
 

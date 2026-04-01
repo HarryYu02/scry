@@ -82,8 +82,8 @@ func Index[T DocumentStore](docsStore []T) (TermFreqIndex, error) {
 		}
 	}
 
-	for id, tFMap := range rawTFMap {
-		for term := range tFMap {
+	for id, tfMap := range rawTFMap {
+		for term := range tfMap {
 			token := strings.ToUpper(term)
 			if len(token) == 0 {
 				break
@@ -170,10 +170,21 @@ func Search(index IndexStore, query string, count int) ([]string, error) {
 	for id := range tfidfMap {
 		ids[idx] = id
 		idx++
+
+		title, err := index.GetTitle(id)
+		if err == nil {
+			if strings.EqualFold(title, query) {
+				tfidfMap[id] *= 10
+			} else if strings.Contains(strings.ToUpper(title), strings.ToUpper(query)) {
+				tfidfMap[id] *= (float64(len(query)) / float64(len(title))) * 10.0
+			}
+		}
 	}
 
 	sort.SliceStable(ids, func(i, j int) bool {
-		return tfidfMap[ids[j]] < tfidfMap[ids[i]]
+		iScore := tfidfMap[ids[i]]
+		jScore := tfidfMap[ids[j]]
+		return iScore > jScore
 	})
 
 	numResult := min(len(ids), count)

@@ -75,8 +75,10 @@ func commandSearch(config *Config, args []string) error {
 		return nil
 	}
 
-	linesToClear := len(ids) + 7
-	fmt.Printf("\033[%dA\033[J", linesToClear)
+	if *urlFlag {
+		linesToClear := len(ids) + 7
+		fmt.Printf("\033[%dA\033[J", linesToClear)
+	}
 
 	selectedID := ids[choice-1]
 	var pos Position
