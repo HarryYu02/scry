@@ -8,7 +8,7 @@ func commandHelp(config *Config, args []string) error {
 	fmt.Println("")
 	fmt.Println("Usage:")
 	fmt.Println("")
-	fmt.Println("\tscry <command> [arguments]")
+	fmt.Println("\tscry [arguments] <command>")
 	fmt.Println("")
 	fmt.Println("The commands are:")
 	fmt.Println("")
