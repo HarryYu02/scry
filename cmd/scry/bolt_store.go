@@ -21,6 +21,9 @@ func (b *BoltStore) GetIDTFMap(stem string) (map[string]float64, error) {
 		}
 
 		idTFMapBytes := bucket.Get([]byte(stem))
+		if idTFMapBytes == nil {
+			return fmt.Errorf("idTFMapBytes not found")
+		}
 		err := json.Unmarshal(idTFMapBytes, &idTFMap)
 		if err != nil {
 			return err
@@ -42,6 +45,9 @@ func (b *BoltStore) GetTitle(docID string) (string, error) {
 		}
 
 		titleBytes := bucket.Get([]byte(docID))
+		if titleBytes == nil {
+			return fmt.Errorf("title not found")
+		}
 		title = string(titleBytes)
 		return nil
 	})
@@ -78,6 +84,10 @@ func (b *BoltStore) GetWordCount(word string) (int, error) {
 		}
 
 		countBytes := bucket.Get([]byte(word))
+		if countBytes == nil {
+			count = 0
+			return nil
+		}
 		countNum, err := strconv.Atoi(string(countBytes))
 		if err != nil {
 			return err

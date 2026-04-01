@@ -20,19 +20,35 @@ type Command struct {
 	callback    func(*Config, []string) error
 }
 
-func readDocs(config *Config, path string) ([]indexer.Document, error) {
+type Position struct {
+	Offset int
+	Len    int
+}
+
+type DocumentWithPos struct {
+	document   indexer.Document
+	byteOffset int
+	length     int
+}
+
+func (d DocumentWithPos)GetDocument() (indexer.Document, error) {
+	return d.document, nil
+}
+
+func readDocs(config *Config, path string) ([]DocumentWithPos, error) {
 	file, err := os.Open(path)
 	if err != nil {
 		return nil, err
 	}
 	defer file.Close()
 
-	sourceDocs := make([]indexer.Document, 0)
+	sourceDocs := make([]DocumentWithPos, 0)
 	fileScanner := bufio.NewScanner(file)
 
 	buf := make([]byte, bufio.MaxScanTokenSize)
 	fileScanner.Buffer(buf, config.MaxBufSize)
 
+	cursor := 0
 	for fileScanner.Scan() {
 		docBytes := fileScanner.Bytes()
 		var docContent indexer.Document
@@ -40,7 +56,13 @@ func readDocs(config *Config, path string) ([]indexer.Document, error) {
 		if err != nil {
 			return nil, err
 		}
-		sourceDocs = append(sourceDocs, docContent)
+
+		sourceDocs = append(sourceDocs, DocumentWithPos{
+			document: docContent,
+			byteOffset: cursor,
+			length: len(docBytes)+1,
+		})
+		cursor += len(docBytes)+1
 	}
 
 	if err := fileScanner.Err(); err != nil {

@@ -22,13 +22,17 @@ type TermFreqIndex struct {
 	IDTitleMap     map[string]string
 }
 
+type DocumentStore interface {
+	GetDocument() (Document, error)
+}
+
 type IndexStore interface {
 	GetIDTFMap(string) (map[string]float64, error)
 	GetTitle(string) (string, error)
 	WordFreq
 }
 
-func Index(source []Document) (TermFreqIndex, error) {
+func Index[T DocumentStore](docsStore []T) (TermFreqIndex, error) {
 	index := TermFreqIndex{
 		StemIDTFMap: make(map[string]map[string]float64),
 		AllTFMap: make(map[string]int),
@@ -36,7 +40,7 @@ func Index(source []Document) (TermFreqIndex, error) {
 	}
 
 	// total num of docs
-	numDocs := float64(len(source))
+	numDocs := float64(len(docsStore))
 	// stem -> num of documents it appears
 	stemDocFreqMap := make(map[string]int)
 	// doc id -> stem -> count
@@ -44,7 +48,11 @@ func Index(source []Document) (TermFreqIndex, error) {
 	// doc id -> total word count in doc
 	wordCountMap := make(map[string]int)
 
-	for _, doc := range source {
+	for _, docStore := range docsStore {
+		doc, err := docStore.GetDocument()
+		if err != nil {
+			return TermFreqIndex{}, err
+		}
 		lexer := newLexer(doc.Content)
 		index.IDTitleMap[doc.ID] = doc.Title
 

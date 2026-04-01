@@ -45,6 +45,27 @@ func commandIndex(config *Config, args []string) error {
 	defer db.Close()
 
 	err = db.Update(func(tx *bolt.Tx) error {
+		posBucket := tx.Bucket([]byte("Position"))
+		if posBucket == nil {
+			posBucket, err = tx.CreateBucket([]byte("Position"))
+			if err != nil {
+				return fmt.Errorf("create bucket: %s", err)
+			}
+		}
+		for _, docWithPos := range sourceDocs {
+			posBytes, err := json.Marshal(Position{
+				Offset: docWithPos.byteOffset,
+				Len: docWithPos.length,
+			})
+			if err != nil {
+				return err
+			}
+			err = posBucket.Put([]byte(docWithPos.document.ID), posBytes)
+			if err != nil {
+				return err
+			}
+		}
+
 		titleBucket := tx.Bucket([]byte("Title"))
 		if titleBucket == nil {
 			titleBucket, err = tx.CreateBucket([]byte("Title"))
@@ -52,7 +73,6 @@ func commandIndex(config *Config, args []string) error {
 				return fmt.Errorf("create bucket: %s", err)
 			}
 		}
-
 		for id, title := range index.IDTitleMap {
 			err := titleBucket.Put([]byte(id), []byte(title))
 			if err != nil {
