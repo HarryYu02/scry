@@ -5,6 +5,11 @@ import (
 	"math"
 )
 
+type WordFreq interface {
+	GetWords() ([]string, error)
+	GetWordCount(word string) (int, error)
+}
+
 func calcLevenshteinDist(source, target string) int {
 	dpRowNum := len(source) + 1
 	dpColNum := len(target) + 1
@@ -39,17 +44,22 @@ func calcLevenshteinDist(source, target string) int {
 	return dp[len(source)][len(target)]
 }
 
-func findClosestTerm(wordFreq *map[string]int, term string) (string, error) {
-	if len(*wordFreq) == 0 {
-		return "", fmt.Errorf("findClosestTerm() expects wordFreq to be non-empty")
-	}
+func findClosestTerm(wordFreq WordFreq, term string) (string, error) {
 	if len(term) == 0 {
 		return "", fmt.Errorf("findClosestTerm() expects term to be non-empty")
 	}
 	closestWord := ""
 	minLevDist := math.MaxInt
 	closestWordFreq := 0
-	for word, freq := range *wordFreq {
+	words, err := wordFreq.GetWords()
+	if err != nil {
+		return "", err
+	}
+	for _, word := range words {
+		freq, err := wordFreq.GetWordCount(word)
+		if err != nil {
+			return "", err
+		}
 		levDist := calcLevenshteinDist(word, term)
 		if levDist < minLevDist {
 			closestWord = word
@@ -61,6 +71,9 @@ func findClosestTerm(wordFreq *map[string]int, term string) (string, error) {
 			minLevDist = levDist
 			closestWordFreq = freq
 		}
+	}
+	if closestWord == "" {
+		return "", fmt.Errorf("findClosestTerm() cannot find a closest term")
 	}
 	return closestWord, nil
 }

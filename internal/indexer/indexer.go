@@ -16,16 +16,23 @@ type Document struct {
 	Tags    []string `json:"tags,omitempty"`
 }
 
-type TermFreq = map[string]int
 type TermFreqIndex struct {
 	StemIDTFMap    map[string]map[string]float64
-	AllTFMap       TermFreq
+	AllTFMap       map[string]int
+	IDTitleMap     map[string]string
+}
+
+type IndexStore interface {
+	GetIDTFMap(string) (map[string]float64, error)
+	GetTitle(string) (string, error)
+	WordFreq
 }
 
 func Index(source []Document) (TermFreqIndex, error) {
 	index := TermFreqIndex{
 		StemIDTFMap: make(map[string]map[string]float64),
-		AllTFMap: make(TermFreq),
+		AllTFMap: make(map[string]int),
+		IDTitleMap: make(map[string]string),
 	}
 
 	// total num of docs
@@ -39,6 +46,7 @@ func Index(source []Document) (TermFreqIndex, error) {
 
 	for _, doc := range source {
 		lexer := newLexer(doc.Content)
+		index.IDTitleMap[doc.ID] = doc.Title
 
 		for lexer.Cursor < len(lexer.Content) {
 			token := strings.ToUpper(lexer.NextToken())
@@ -105,7 +113,7 @@ func Index(source []Document) (TermFreqIndex, error) {
 	return index, nil
 }
 
-func Search(index *TermFreqIndex, query string, count int) ([]string, error) {
+func Search(index IndexStore, query string, count int) ([]string, error) {
 	if count == 0 {
 		return nil, fmt.Errorf("Search expects count > 0")
 	}
@@ -126,17 +134,22 @@ func Search(index *TermFreqIndex, query string, count int) ([]string, error) {
 			i++
 			continue
 		}
-		if _, ok := index.AllTFMap[term]; ok {
+		wordCount, err := index.GetWordCount(term)
+		if err != nil {
+			return nil, err
+		}
+		if wordCount > 0 {
 			stemmedTerm, err := stem(term)
 			if err != nil {
 				return nil, err
 			}
-			for id, tfidf := range index.StemIDTFMap[stemmedTerm] {
+			idTFMap, err := index.GetIDTFMap(stemmedTerm)
+			for id, tfidf := range idTFMap {
 				tfidfMap[id] += tfidf
 			}
 			i++
 		} else {
-			closestWord, err := findClosestTerm(&index.AllTFMap, term)
+			closestWord, err := findClosestTerm(index, term)
 			if err != nil {
 				return nil, err
 			}

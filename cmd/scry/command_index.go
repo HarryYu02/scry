@@ -1,13 +1,14 @@
 package main
 
 import (
-	"bytes"
-	"encoding/gob"
+	"encoding/json"
 	"fmt"
 	"os"
 	"path/filepath"
+	"strconv"
 
 	"github.com/HarryYu02/scry/internal/indexer"
+	bolt "go.etcd.io/bbolt"
 )
 
 func commandIndex(config *Config, args []string) error {
@@ -27,13 +28,6 @@ func commandIndex(config *Config, args []string) error {
 		return err
 	}
 
-	var indexGob bytes.Buffer
-	enc := gob.NewEncoder(&indexGob)
-	err = enc.Encode(index)
-	if err != nil {
-		return err
-	}
-
 	indexDir := filepath.Join(config.Root, "index")
 	if dirStat, err := os.Stat(indexDir); err != nil || !dirStat.IsDir() {
 		err := os.MkdirAll(indexDir, 0750)
@@ -42,15 +36,65 @@ func commandIndex(config *Config, args []string) error {
 		}
 	}
 
-	indexFileName := fmt.Sprintf("%s%s", args[0], ".gob")
+	indexFileName := fmt.Sprintf("%s%s", args[0], ".db")
 	indexPath := filepath.Join(indexDir, indexFileName)
-	file, err := os.OpenFile(indexPath, os.O_RDWR|os.O_CREATE, 0644)
+	db, err := bolt.Open(indexPath, 0600, nil)
 	if err != nil {
 		return err
 	}
-	defer file.Close()
+	defer db.Close()
 
-	_, err = file.Write(indexGob.Bytes())
+	err = db.Update(func(tx *bolt.Tx) error {
+		titleBucket := tx.Bucket([]byte("Title"))
+		if titleBucket == nil {
+			titleBucket, err = tx.CreateBucket([]byte("Title"))
+			if err != nil {
+				return fmt.Errorf("create bucket: %s", err)
+			}
+		}
+
+		for id, title := range index.IDTitleMap {
+			err := titleBucket.Put([]byte(id), []byte(title))
+			if err != nil {
+				return err
+			}
+		}
+
+		wordCountBucket := tx.Bucket([]byte("WordCount"))
+		if wordCountBucket == nil {
+			wordCountBucket, err = tx.CreateBucket([]byte("WordCount"))
+			if err != nil {
+				return fmt.Errorf("create bucket: %s", err)
+			}
+		}
+		for term, freq := range index.AllTFMap {
+			freqStr := strconv.Itoa(freq)
+			err := wordCountBucket.Put([]byte(term), []byte(freqStr))
+			if err != nil {
+				return err
+			}
+		}
+
+		IDTFBucket := tx.Bucket([]byte("IDTF"))
+		if IDTFBucket == nil {
+			IDTFBucket, err = tx.CreateBucket([]byte("IDTF"))
+			if err != nil {
+				return fmt.Errorf("create bucket: %s", err)
+			}
+		}
+		for stem, idTFMap := range index.StemIDTFMap {
+			mapBytes, err := json.Marshal(idTFMap)
+			if err != nil {
+				return err
+			}
+			err = IDTFBucket.Put([]byte(stem), mapBytes)
+			if err != nil {
+				return err
+			}
+		}
+
+		return nil
+	})
 	if err != nil {
 		return err
 	}

@@ -1,56 +1,35 @@
 package main
 
 import (
-	"bytes"
-	"encoding/gob"
 	"fmt"
-	"os"
 	"path/filepath"
 	"strconv"
 	"strings"
 
 	"github.com/HarryYu02/scry/internal/indexer"
+	bolt "go.etcd.io/bbolt"
 )
 
 func commandSearch(config *Config, args []string) error {
 	if len(args) < 2 {
 		return fmt.Errorf("search expects a source and a query")
 	}
-	source := fmt.Sprintf("%s%s", args[0], ".jsonl")
-	sourcePath := filepath.Join(config.Root, "data", source)
 	query := strings.Join(args[1:], " ")
 	// TODO: add -n flag
 	numResult := 10
 
-	sourceDocs, err := readDocs(config, sourcePath)
-	if err != nil {
-		return err
-	}
-	idDocMap := make(map[string]indexer.Document)
-	for _, doc := range sourceDocs {
-		idDocMap[doc.ID] = doc
-	}
-
-	indexFileName := fmt.Sprintf("%s%s", args[0], ".gob")
+	indexFileName := fmt.Sprintf("%s%s", args[0], ".db")
 	indexPath := filepath.Join(config.Root, "index", indexFileName)
-	indexContent, err := os.ReadFile(indexPath)
+	db, err := bolt.Open(indexPath, 0600, nil)
 	if err != nil {
 		return err
 	}
+	defer db.Close()
 
-	var b bytes.Buffer
-	_, err = b.Write(indexContent)
-	if err != nil {
-		return err
+	boltStore := BoltStore{
+		db: db,
 	}
-	dec := gob.NewDecoder(&b)
-	var index indexer.TermFreqIndex
-	err = dec.Decode(&index)
-	if err != nil {
-		return err
-	}
-
-	ids, err := indexer.Search(&index, query, numResult)
+	ids, err := indexer.Search(&boltStore, query, numResult)
 	if err != nil {
 		return err
 	}
@@ -58,7 +37,11 @@ func commandSearch(config *Config, args []string) error {
 	fmt.Printf("\nSearch query: %s\n\n", query)
 	fmt.Println("Results:")
 	for i, id := range ids {
-		fmt.Printf("%0.2d: %s\n", i+1, idDocMap[id].Title)
+		title, err := boltStore.GetTitle(id)
+		if err != nil {
+			return err
+		}
+		fmt.Printf("%0.2d: %s\n", i+1, title)
 	}
 	fmt.Printf("\nSelect by typing the number 1-%d (0 to cancel)\n> ", numResult)
 	var input string
@@ -78,12 +61,12 @@ func commandSearch(config *Config, args []string) error {
 		return nil
 	}
 
-	selectedDoc := idDocMap[ids[choice-1]]
+	// selectedID := ids[choice-1]
 	// TODO: add --stdout flag
-	err = render(selectedDoc.Content)
-	if err != nil {
-		return err
-	}
+	// err = render(selectedDoc.Content)
+	// if err != nil {
+	// 	return err
+	// }
 
 	return nil
 }
