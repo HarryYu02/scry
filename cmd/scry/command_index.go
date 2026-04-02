@@ -55,7 +55,7 @@ func commandIndex(config *Config, args []string) error {
 		for _, docWithPos := range sourceDocs {
 			posBytes, err := json.Marshal(Position{
 				Offset: docWithPos.byteOffset,
-				Len: docWithPos.length,
+				Len:    docWithPos.length,
 			})
 			if err != nil {
 				return err

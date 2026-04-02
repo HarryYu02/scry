@@ -65,7 +65,7 @@ func (b *BoltStore) GetWords() ([]string, error) {
 			return fmt.Errorf("WordCount bucket not found")
 		}
 
-		bucket.ForEach(func (k, v []byte) error {
+		bucket.ForEach(func(k, v []byte) error {
 			words = append(words, string(k))
 			return nil
 		})

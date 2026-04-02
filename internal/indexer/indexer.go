@@ -17,9 +17,9 @@ type Document struct {
 }
 
 type TermFreqIndex struct {
-	StemIDTFMap    map[string]map[string]float64
-	AllTFMap       map[string]int
-	IDTitleMap     map[string]string
+	StemIDTFMap map[string]map[string]float64
+	AllTFMap    map[string]int
+	IDTitleMap  map[string]string
 }
 
 type DocumentStore interface {
@@ -35,8 +35,8 @@ type IndexStore interface {
 func Index[T DocumentStore](docsStore []T) (TermFreqIndex, error) {
 	index := TermFreqIndex{
 		StemIDTFMap: make(map[string]map[string]float64),
-		AllTFMap: make(map[string]int),
-		IDTitleMap: make(map[string]string),
+		AllTFMap:    make(map[string]int),
+		IDTitleMap:  make(map[string]string),
 	}
 
 	// total num of docs
@@ -107,7 +107,7 @@ func Index[T DocumentStore](docsStore []T) (TermFreqIndex, error) {
 
 			// calc IDF
 			numDocsHaveTerm := stemDocFreqMap[stemmedToken]
-			idf := math.Log10(float64(numDocs) / float64(1 + numDocsHaveTerm)) + 1
+			idf := math.Log10(float64(numDocs)/float64(1+numDocsHaveTerm)) + 1
 
 			// calc TF-IDF and save to index
 			tfidf := tf * idf
@@ -175,8 +175,10 @@ func Search(index IndexStore, query string, count int) ([]string, error) {
 		if err == nil {
 			if strings.EqualFold(title, query) {
 				tfidfMap[id] *= 10
-			} else if strings.Contains(strings.ToUpper(title), strings.ToUpper(query)) {
+			} else if strings.HasPrefix(strings.ToUpper(title), strings.ToUpper(query)) {
 				tfidfMap[id] *= (float64(len(query)) / float64(len(title))) * 10.0
+			} else if strings.Contains(strings.ToUpper(title), strings.ToUpper(query)) {
+				tfidfMap[id] *= (float64(len(query)) / float64(len(title))) * 8.0
 			}
 		}
 	}

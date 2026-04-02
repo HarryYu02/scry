@@ -34,9 +34,9 @@ func calcLevenshteinDist(source, target string) int {
 			}
 
 			dp[i][j] = min(
-				dp[i-1][j] + 1,
-				dp[i][j-1] + 1,
-				dp[i-1][j-1] + cost,
+				dp[i-1][j]+1,
+				dp[i][j-1]+1,
+				dp[i-1][j-1]+cost,
 			)
 		}
 	}
@@ -77,4 +77,3 @@ func findClosestTerm(wordFreq WordFreq, term string) (string, error) {
 	}
 	return closestWord, nil
 }
-

@@ -12,8 +12,8 @@ func TestStem(t *testing.T) {
 		expected string
 	}{
 		{
-			name: "basic",
-			word: "Accumulations",
+			name:     "basic",
+			word:     "Accumulations",
 			expected: "ACCUMUL",
 		},
 	}

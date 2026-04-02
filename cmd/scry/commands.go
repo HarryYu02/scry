@@ -33,7 +33,7 @@ type DocumentWithPos struct {
 	length     int
 }
 
-func (d DocumentWithPos)GetDocument() (indexer.Document, error) {
+func (d DocumentWithPos) GetDocument() (indexer.Document, error) {
 	return d.document, nil
 }
 
@@ -60,11 +60,11 @@ func readDocs(config *Config, path string) ([]DocumentWithPos, error) {
 		}
 
 		sourceDocs = append(sourceDocs, DocumentWithPos{
-			document: docContent,
+			document:   docContent,
 			byteOffset: cursor,
-			length: len(docBytes)+1,
+			length:     len(docBytes) + 1,
 		})
-		cursor += len(docBytes)+1
+		cursor += len(docBytes) + 1
 	}
 
 	if err := fileScanner.Err(); err != nil {
@@ -92,12 +92,12 @@ func getCommands() map[string]Command {
 			name:        "search",
 			description: "Search the query from the given source",
 			usage:       "scry search <source> <query>",
-			flags:       map[string]string{
-				"url"   : "Return the url of the search result instead",
+			flags: map[string]string{
+				"url": "Return the url of the search result instead",
 				// "stdout": "Pipe content of search result to stdout instead",
 				// "editor": "Pipe content of search result to be opened in $EDITOR instead",
 			},
-			callback:    commandSearch,
+			callback: commandSearch,
 		},
 	}
 }

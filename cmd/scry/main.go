@@ -27,7 +27,7 @@ func main() {
 			log.Fatal("ERROR: could not start CPU profile: ", err)
 		}
 		defer pprof.StopCPUProfile()
-    }
+	}
 
 	if len(flag.Args()) < 1 {
 		log.Fatal("ERROR: command not provided")
@@ -47,7 +47,7 @@ func main() {
 	config := &Config{
 		Root:       root,
 		MaxBufSize: MAX_BUF_SIZE,
-		Commands: getCommands(),
+		Commands:   getCommands(),
 	}
 	command, ok := config.Commands[cmd]
 	if !ok {
@@ -68,6 +68,6 @@ func main() {
 		runtime.GC()
 		if err := pprof.Lookup("allocs").WriteTo(f, 0); err != nil {
 			log.Fatal("ERROR: could not write memory profile: ", err)
-        }
-    }
+		}
+	}
 }
