@@ -18,6 +18,9 @@ Just like the mechanic, Scry scrapes wiki pages to your filesystem, and let you 
 The idea is to be modular that I can write custom scrapers, fine tune the searching algorithm, and use it anywhere.
 Now I can take the wiki with me offline, even port it to any front end I want, for any game.
 
+For a more in-depth, high-level overview, please read my [blog post](https://harry-yu.com/blogs/3).
+It will be a ~5 minutes read but I would very much appreciate if you can give it a go.
+
 ## Architecture
 The Scry project is split into three independent components:
 1. **Scry Scraper (scraper/):** Downloads wiki pages and compiles them into a `.jsonl` dataset.
