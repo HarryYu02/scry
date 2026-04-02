@@ -12,6 +12,7 @@ type Config struct {
 	Root       string
 	MaxBufSize int
 	Commands   map[string]Command
+	Pager      string
 }
 
 type Command struct {
@@ -94,8 +95,7 @@ func getCommands() map[string]Command {
 			usage:       "scry search <source> <query>",
 			flags: map[string]string{
 				"url": "Return the url of the search result instead",
-				// "stdout": "Pipe content of search result to stdout instead",
-				// "editor": "Pipe content of search result to be opened in $EDITOR instead",
+				"stdout": "Pipe content of search result to stdout instead",
 			},
 			callback: commandSearch,
 		},

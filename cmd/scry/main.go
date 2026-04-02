@@ -48,6 +48,7 @@ func main() {
 		Root:       root,
 		MaxBufSize: MAX_BUF_SIZE,
 		Commands:   getCommands(),
+		Pager:      "less -R",
 	}
 	command, ok := config.Commands[cmd]
 	if !ok {

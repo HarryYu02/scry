@@ -34,7 +34,7 @@
 
 18. ~~**Help command:** Implement a more comprehensive help command for each subcommand and their flags.~~
 
-19. **Optimize searching algo:** Optimize the weight of each search term base on document's title.
+19. ~~**Optimize searching algo:** Optimize the weight of each search term base on document's title.~~
 
 20. **Incremental indexing:** Only index data that has been modified.
 

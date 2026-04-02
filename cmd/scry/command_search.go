@@ -21,6 +21,7 @@ func commandSearch(config *Config, args []string) error {
 	}
 
 	urlFlag := searchCmd.Bool("url", false, config.Commands["search"].flags["url"])
+	stdoutFlag := searchCmd.Bool("stdout", false, config.Commands["search"].flags["stdout"])
 
 	searchCmd.Parse(args)
 	args = searchCmd.Args()
@@ -75,7 +76,7 @@ func commandSearch(config *Config, args []string) error {
 		return nil
 	}
 
-	if *urlFlag {
+	if *urlFlag || *stdoutFlag {
 		linesToClear := len(ids) + 7
 		fmt.Printf("\033[%dA\033[J", linesToClear)
 	}
@@ -127,9 +128,12 @@ func commandSearch(config *Config, args []string) error {
 	if *urlFlag {
 		fmt.Print(doc.URL)
 		return nil
+	} else if *stdoutFlag {
+		fmt.Print(doc.Content)
+		return nil
 	}
 
-	err = render(doc.Content)
+	err = render(doc.Content, config.Pager)
 	if err != nil {
 		return err
 	}

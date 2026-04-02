@@ -73,13 +73,17 @@ func checkExecExist(name string) bool {
 	return err == nil
 }
 
-func render(content string) error {
-	// TODO: allow custom pager
-	if !checkExecExist("less") {
-		return fmt.Errorf("cannot find pager '%s' in PATH", "less")
+func render(content string, pager string) error {
+	pagerArgs := strings.Fields(pager)
+	if len(pagerArgs) < 1 {
+		return fmt.Errorf("render failed: pager not provided")
 	}
-	cmd := exec.Command("less", "-R")
-	fmt.Printf("Launching %s\n", cmd.String())
+
+	if !checkExecExist(pagerArgs[0]) {
+		return fmt.Errorf("cannot find pager '%s' in PATH", pagerArgs[0])
+	}
+	cmd := exec.Command(pagerArgs[0], pagerArgs[1:]...)
+	fmt.Printf("Launching '%s' to view content...\n", cmd.String())
 	formattedContent, err := formatMdToAnsi(content)
 	if err != nil {
 		return err
