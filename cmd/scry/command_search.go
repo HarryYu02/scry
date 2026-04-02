@@ -22,6 +22,7 @@ func commandSearch(config *Config, args []string) error {
 
 	urlFlag := searchCmd.Bool("url", false, config.Commands["search"].flags["url"])
 	stdoutFlag := searchCmd.Bool("stdout", false, config.Commands["search"].flags["stdout"])
+	nFlag := searchCmd.Int("n", 10, config.Commands["search"].flags["n"])
 
 	searchCmd.Parse(args)
 	args = searchCmd.Args()
@@ -30,8 +31,7 @@ func commandSearch(config *Config, args []string) error {
 		return fmt.Errorf("search expects a source and a query")
 	}
 	query := strings.Join(args[1:], " ")
-	// TODO: add -n flag
-	numResult := 10
+	numResult := *nFlag
 
 	indexFileName := fmt.Sprintf("%s%s", args[0], ".db")
 	indexPath := filepath.Join(config.Root, "index", indexFileName)

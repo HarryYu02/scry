@@ -62,6 +62,7 @@ scry-scraper stsfandom
 
 ### 3. Try it out
 ```bash
+scry help
 scry index stsfandom
 scry search stsfandom "watcher scry"
 ```
@@ -71,6 +72,8 @@ Available commands:
 - help
 - index
 - search
+
+Use "scry help <command>" for more information about a command.
 
 ## Contributing
 Please see [contribute](https://github.com/HarryYu02/scry/blob/main/docs/contribute.md) for how to contribute.

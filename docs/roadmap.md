@@ -20,21 +20,21 @@
 
 11. ~~**Stop word list:** Implement stop-word map to drop junk word~~
 
-12. **Custom Scraper Documentation**: Write a clear tutorial in docs/ detailing how contributors can inherit from the base Python scraper class to add support for their own game wikis.
+12. ~~**Output formats:** Implement --stdout, --editor, or other flags for search to format output.~~
 
-13. **Rolling Dataset Releases:** Create a `gh` CLI script (or GitHub Action) to automatically upload freshly scraped `.jsonl.gz` datasets to a rolling `latest-datasets` release tag, preventing git history bloat while keeping users up-to-date.
+13. ~~**Help command:** Implement a more comprehensive help command for each subcommand and their flags.~~
 
-14. **Structured Logging:** Implement standard library logging (Go `slog`, Python `logging`). Route all logs to `stderr` to keep `stdout` pure for terminal piping.
+14. ~~**Optimize searching algo:** Optimize the weight of each search term base on document's title.~~
 
-15. **Comprehensive Testing:** Implement unit and integration tests across all three core components (Python Scraper, Go Indexer, and Go Search CLI) and add a `make test` target to execute them all.
+15. **Custom Scraper Documentation**: Write a clear tutorial in docs/ detailing how contributors can inherit from the base Python scraper class to add support for their own game wikis.
 
-16. **Scry-CLI UI Polish:** Add contextual match snippets with ANSI keyword highlights, strictly respect the `NO_COLOR` environment variable, and structure the `--help` menu output.
+16. **Rolling Dataset Releases:** Create a `gh` CLI script (or GitHub Action) to automatically upload freshly scraped `.jsonl.gz` datasets to a rolling `latest-datasets` release tag, preventing git history bloat while keeping users up-to-date.
 
-17. **Output formats:** Implement --stdout, --editor, or other flags for search to format output.
+17. **Structured Logging:** Implement standard library logging (Go `slog`, Python `logging`). Route all logs to `stderr` to keep `stdout` pure for terminal piping.
 
-18. ~~**Help command:** Implement a more comprehensive help command for each subcommand and their flags.~~
+18. **Comprehensive Testing:** Implement unit and integration tests across all three core components (Python Scraper, Go Indexer, and Go Search CLI) and add a `make test` target to execute them all.
 
-19. ~~**Optimize searching algo:** Optimize the weight of each search term base on document's title.~~
+19. **Scry-CLI UI Polish:** Add contextual match snippets with ANSI keyword highlights, strictly respect the `NO_COLOR` environment variable, and structure the `--help` menu output.
 
 20. **Incremental indexing:** Only index data that has been modified.
 
