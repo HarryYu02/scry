@@ -49,16 +49,16 @@ func commandSearch(config *Config, args []string) error {
 		return err
 	}
 
-	fmt.Printf("\nSearch query: %s\n\n", query)
-	fmt.Println("Results:")
+	fmt.Fprintf(os.Stderr, "\nSearch query: %s\n\n", query)
+	fmt.Fprintln(os.Stderr, "Results:")
 	for i, id := range ids {
 		title, err := boltStore.GetTitle(id)
 		if err != nil {
 			return err
 		}
-		fmt.Printf("%0.2d: %s\n", i+1, title)
+		fmt.Fprintf(os.Stderr, "%0.2d: %s\n", i+1, title)
 	}
-	fmt.Printf("\nSelect by typing the number 1-%d (0 to cancel)\n> ", numResult)
+	fmt.Fprintf(os.Stderr, "\nSelect by typing the number 1-%d (0 to cancel)\n> ", numResult)
 	var input string
 	_, err = fmt.Scanln(&input)
 	if err != nil {
@@ -72,13 +72,8 @@ func commandSearch(config *Config, args []string) error {
 		return fmt.Errorf("choice out of bound")
 	}
 	if choice == 0 {
-		fmt.Printf("Cancel search\n")
+		fmt.Fprintf(os.Stderr, "Cancel search\n")
 		return nil
-	}
-
-	if *urlFlag || *stdoutFlag {
-		linesToClear := len(ids) + 7
-		fmt.Printf("\033[%dA\033[J", linesToClear)
 	}
 
 	selectedID := ids[choice-1]
