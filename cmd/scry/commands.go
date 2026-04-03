@@ -92,11 +92,11 @@ func getCommands() map[string]Command {
 		"search": {
 			name:        "search",
 			description: "Search the query from the given source",
-			usage:       "scry search <source> <query>",
+			usage:       "scry search [flags] <source> <query>",
 			flags: map[string]string{
-				"url": "Return the url of the search result instead",
+				"url":    "Return the url of the search result instead",
 				"stdout": "Pipe content of search result to stdout instead",
-				"n" : "Limit maximum search result, default to be 10",
+				"n":      "Limit maximum search result, default to be 10",
 			},
 			callback: commandSearch,
 		},
