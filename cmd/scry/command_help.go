@@ -31,17 +31,19 @@ func commandHelp(config *Config, args []string) error {
 		fmt.Println("")
 		fmt.Println("\t", subCommand.usage)
 		fmt.Println("")
-		fmt.Println("The flags are:")
-		fmt.Println("")
-		lenLongestFlagName := 0
-		for flagName := range subCommand.flags {
-			lenLongestFlagName = max(lenLongestFlagName, len(flagName))
+		if len(subCommand.flags) > 0 {
+			fmt.Println("The flags are:")
+			fmt.Println("")
+			lenLongestFlagName := 0
+			for flagName := range subCommand.flags {
+				lenLongestFlagName = max(lenLongestFlagName, len(flagName))
+			}
+			for flagName, flagDesc := range subCommand.flags {
+				paddedName := padRight(flagName, ' ', lenLongestFlagName+1)
+				fmt.Printf("\t--%s-- %s\n", paddedName, flagDesc)
+			}
+			fmt.Println("")
 		}
-		for flagName, flagDesc := range subCommand.flags {
-			paddedName := padRight(flagName, ' ', lenLongestFlagName+1)
-			fmt.Printf("\t--%s-- %s\n", paddedName, flagDesc)
-		}
-		fmt.Println("")
 	} else {
 		fmt.Println("")
 		fmt.Println("Scry is a modular, offline-first, terminal-native search engine.")

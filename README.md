@@ -75,8 +75,19 @@ Available commands:
 - help
 - index
 - search
+- open
 
-Use "scry help <command>" for more information about a command.
+Use "scry help \<command\>" for more information about a command.
+
+To use `fzf` as a selector for Scry:
+```bash
+fzf --disabled \
+  --bind "change:reload(scry search --n=0 --docs --meta bg3wiki {q} | jq -r '.id + \"\t\" + .title')" \
+  --delimiter '\t' \
+  --with-nth 2 \
+  | cut -f1 \
+  | xargs -r scry open bg3wiki
+```
 
 ## Contributing
 Please see [contribute](https://github.com/HarryYu02/scry/blob/main/docs/contribute.md) for how to contribute.
