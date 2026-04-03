@@ -2,8 +2,10 @@ package main
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
+	"io/fs"
 	"os"
 	"path/filepath"
 
@@ -11,9 +13,29 @@ import (
 	bolt "go.etcd.io/bbolt"
 )
 
+func fileExists(path string) (bool, error) {
+    _, err := os.Stat(path)
+    if err == nil {
+        return true, nil
+    }
+    if errors.Is(err, fs.ErrNotExist) {
+        return false, nil
+    }
+    return false, err
+}
+
 func openIndex(config *Config, source string) (*bolt.DB, error) {
 	indexFileName := fmt.Sprintf("%s%s", source, ".db")
 	indexPath := filepath.Join(config.Root, "index", indexFileName)
+
+	indexExists, err := fileExists(indexPath)
+	if err != nil {
+		return nil, err
+	}
+	if !indexExists {
+		return nil, fmt.Errorf("index not found, please run 'scry index <source>' first")
+	}
+
 	db, err := bolt.Open(indexPath, 0600, nil)
 	if err != nil {
 		return nil, err

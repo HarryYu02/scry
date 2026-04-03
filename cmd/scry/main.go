@@ -57,7 +57,7 @@ func main() {
 
 	err = command.callback(config, args)
 	if err != nil {
-		log.Fatal("ERROR: error in executing command: ", err)
+		log.Fatal("ERROR: ", err)
 	}
 
 	if *memprofile != "" {
