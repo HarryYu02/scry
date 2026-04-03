@@ -100,3 +100,29 @@ func (b *BoltStore) GetWordCount(word string) (int, error) {
 	}
 	return count, nil
 }
+
+func (b *BoltStore)GetPosition(docID string) (Position, error) {
+	var pos Position
+	err := b.db.View(func(tx *bolt.Tx) error {
+		posBucket := tx.Bucket([]byte("Position"))
+		if posBucket == nil {
+			return fmt.Errorf("posBucket not found in index")
+		}
+		posBytes := posBucket.Get([]byte(docID))
+		if posBytes == nil {
+			return fmt.Errorf("cannot find %s in posBucket", docID)
+		}
+
+		err := json.Unmarshal(posBytes, &pos)
+		if err != nil {
+			return err
+		}
+
+		return nil
+	})
+	if err != nil {
+		return Position{}, err
+	}
+	return pos, nil
+}
+

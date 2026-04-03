@@ -26,18 +26,19 @@
 
 14. ~~**Optimize searching algo:** Optimize the weight of each search term base on document's title.~~
 
-15. **Custom Scraper Documentation**: Write a clear tutorial in docs/ detailing how contributors can inherit from the base Python scraper class to add support for their own game wikis.
+15. ~~**Scry-CLI UI Polish:** Add contextual match snippets with ANSI keyword highlights, strictly respect the `NO_COLOR` environment variable, and structure the `--help` menu output.~~
 
-16. **Rolling Dataset Releases:** Create a `gh` CLI script (or GitHub Action) to automatically upload freshly scraped `.jsonl.gz` datasets to a rolling `latest-datasets` release tag, preventing git history bloat while keeping users up-to-date.
+16. ~~**fzf integration:** Allows live search via fzf scripting.~~
 
-17. **Structured Logging:** Implement standard library logging (Go `slog`, Python `logging`). Route all logs to `stderr` to keep `stdout` pure for terminal piping.
+17. **Custom Scraper Documentation**: Write a clear tutorial in docs/ detailing how contributors can inherit from the base Python scraper class to add support for their own game wikis.
 
-18. **Comprehensive Testing:** Implement unit and integration tests across all three core components (Python Scraper, Go Indexer, and Go Search CLI) and add a `make test` target to execute them all.
+18. **Rolling Dataset Releases:** Create a `gh` CLI script (or GitHub Action) to automatically upload freshly scraped `.jsonl.gz` datasets to a rolling `latest-datasets` release tag, preventing git history bloat while keeping users up-to-date.
 
-19. **Scry-CLI UI Polish:** Add contextual match snippets with ANSI keyword highlights, strictly respect the `NO_COLOR` environment variable, and structure the `--help` menu output.
+19. **Structured Logging:** Implement standard library logging (Go `slog`, Python `logging`). Route all logs to `stderr` to keep `stdout` pure for terminal piping.
 
-20. **Incremental indexing:** Only index data that has been modified.
+20. **Comprehensive Testing:** Implement unit and integration tests across all three core components (Python Scraper, Go Indexer, and Go Search CLI) and add a `make test` target to execute them all.
 
-21. **Concurrent indexing:** Index multiple documents concurrently to speed up indexing.
+21. **Incremental indexing:** Only index data that has been modified.
 
-22. **fzf integration:** Allows live search via fzf scripting.
+22. **Concurrent indexing:** Index multiple documents concurrently to speed up indexing.
+

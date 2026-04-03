@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bufio"
 	"encoding/json"
 	"fmt"
 	"os"
@@ -11,14 +12,52 @@ import (
 	bolt "go.etcd.io/bbolt"
 )
 
+func readDocs(config *Config, dataFile *os.File) ([]DocumentWithPos, error) {
+	sourceDocs := make([]DocumentWithPos, 0)
+	fileScanner := bufio.NewScanner(dataFile)
+
+	buf := make([]byte, bufio.MaxScanTokenSize)
+	fileScanner.Buffer(buf, config.MaxBufSize)
+
+	cursor := 0
+	for fileScanner.Scan() {
+		docBytes := fileScanner.Bytes()
+		var docContent indexer.Document
+		err := json.Unmarshal(docBytes, &docContent)
+		if err != nil {
+			return nil, err
+		}
+
+		sourceDocs = append(sourceDocs, DocumentWithPos{
+			document:   docContent,
+			byteOffset: cursor,
+			length:     len(docBytes) + 1,
+		})
+		cursor += len(docBytes) + 1
+	}
+
+	if err := fileScanner.Err(); err != nil {
+		return nil, err
+	}
+
+	return sourceDocs, nil
+}
+
+
 func commandIndex(config *Config, args []string) error {
 	if len(args) < 1 {
 		return fmt.Errorf("index expects a source")
 	}
+
 	source := fmt.Sprintf("%s%s", args[0], ".jsonl")
 	sourcePath := filepath.Join(config.Root, "data", source)
+	dataFile, err := os.Open(sourcePath)
+	if err != nil {
+		return err
+	}
+	defer dataFile.Close()
 
-	sourceDocs, err := readDocs(config, sourcePath)
+	sourceDocs, err := readDocs(config, dataFile)
 	if err != nil {
 		return err
 	}

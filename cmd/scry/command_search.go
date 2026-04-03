@@ -5,17 +5,26 @@ import (
 	"flag"
 	"fmt"
 	"os"
-	"path/filepath"
 	"strconv"
 	"strings"
 
 	"github.com/HarryYu02/scry/internal/indexer"
-	bolt "go.etcd.io/bbolt"
 )
 
 type Meta struct {
 	ID    string `json:"id"`
 	Title string `json:"title"`
+}
+
+func parseChoice(input string, numChoice int) (int, error) {
+	choice, err := strconv.Atoi(input)
+	if err != nil {
+		return 0, err
+	}
+	if choice < 0 || choice > numChoice {
+		return 0, fmt.Errorf("choice out of bound")
+	}
+	return choice, nil
 }
 
 func promptSelectID(query string, ids []string, boltStore *BoltStore, numResult int) (string, error) {
@@ -29,23 +38,22 @@ func promptSelectID(query string, ids []string, boltStore *BoltStore, numResult 
 		fmt.Fprintf(os.Stderr, "%0.2d: %s\n", i+1, title)
 	}
 	fmt.Fprintf(os.Stderr, "\nSelect by typing the number 1-%d (0 to cancel)\n> ", numResult)
+
 	var input string
 	_, err := fmt.Scanln(&input)
 	if err != nil {
 		return "", err
 	}
-	choice, err := strconv.Atoi(input)
+
+	choice, err := parseChoice(input, len(ids))
 	if err != nil {
 		return "", err
 	}
-	if choice < 0 || choice > len(ids) {
-		return "", fmt.Errorf("choice out of bound")
-	}
+
 	if choice == 0 {
 		fmt.Fprintf(os.Stderr, "Cancel search\n")
 		return "", nil
 	}
-
 	return ids[choice-1], nil
 }
 
@@ -67,12 +75,11 @@ func commandSearch(config *Config, args []string) error {
 	if len(args) < 2 {
 		return fmt.Errorf("search expects a source and a query")
 	}
+	source := args[0]
 	query := strings.Join(args[1:], " ")
 	numResult := *nFlag
 
-	indexFileName := fmt.Sprintf("%s%s", args[0], ".db")
-	indexPath := filepath.Join(config.Root, "index", indexFileName)
-	db, err := bolt.Open(indexPath, 0600, nil)
+	db, err := openIndex(config, source)
 	if err != nil {
 		return err
 	}
@@ -114,7 +121,7 @@ func commandSearch(config *Config, args []string) error {
 		return err
 	}
 
-	doc, err := open(config, args[0], selectedID, &boltStore)
+	doc, err := open(config, source, selectedID, &boltStore)
 	if err != nil {
 		return err
 	}
@@ -159,5 +166,6 @@ func commandSearch(config *Config, args []string) error {
 	if err != nil {
 		return err
 	}
+
 	return nil
 }

@@ -1,10 +1,6 @@
 package main
 
 import (
-	"bufio"
-	"encoding/json"
-	"os"
-
 	"github.com/HarryYu02/scry/internal/indexer"
 )
 
@@ -36,43 +32,6 @@ type DocumentWithPos struct {
 
 func (d DocumentWithPos) GetDocument() (indexer.Document, error) {
 	return d.document, nil
-}
-
-func readDocs(config *Config, path string) ([]DocumentWithPos, error) {
-	file, err := os.Open(path)
-	if err != nil {
-		return nil, err
-	}
-	defer file.Close()
-
-	sourceDocs := make([]DocumentWithPos, 0)
-	fileScanner := bufio.NewScanner(file)
-
-	buf := make([]byte, bufio.MaxScanTokenSize)
-	fileScanner.Buffer(buf, config.MaxBufSize)
-
-	cursor := 0
-	for fileScanner.Scan() {
-		docBytes := fileScanner.Bytes()
-		var docContent indexer.Document
-		err := json.Unmarshal(docBytes, &docContent)
-		if err != nil {
-			return nil, err
-		}
-
-		sourceDocs = append(sourceDocs, DocumentWithPos{
-			document:   docContent,
-			byteOffset: cursor,
-			length:     len(docBytes) + 1,
-		})
-		cursor += len(docBytes) + 1
-	}
-
-	if err := fileScanner.Err(); err != nil {
-		return nil, err
-	}
-
-	return sourceDocs, nil
 }
 
 func getCommands() map[string]Command {

@@ -11,46 +11,66 @@ import (
 	bolt "go.etcd.io/bbolt"
 )
 
-func open(config *Config, source, id string, boltStore *BoltStore) (indexer.Document, error) {
-	var pos Position
-	boltStore.db.View(func(tx *bolt.Tx) error {
-		posBucket := tx.Bucket([]byte("Position"))
-		if posBucket == nil {
-			return fmt.Errorf("posBucket not found in index")
-		}
-		posBytes := posBucket.Get([]byte(id))
-		if posBytes == nil {
-			return fmt.Errorf("cannot find %s in posBucket", id)
-		}
+func openIndex(config *Config, source string) (*bolt.DB, error) {
+	indexFileName := fmt.Sprintf("%s%s", source, ".db")
+	indexPath := filepath.Join(config.Root, "index", indexFileName)
+	db, err := bolt.Open(indexPath, 0600, nil)
+	if err != nil {
+		return nil, err
+	}
+	return db, nil
+}
 
-		err := json.Unmarshal(posBytes, &pos)
-		if err != nil {
-			return err
-		}
-
-		return nil
-	})
-
+func openDataFile(config *Config, source string) (*os.File, error) {
 	dataFileName := fmt.Sprintf("%s%s", source, ".jsonl")
 	dataPath := filepath.Join(config.Root, "data", dataFileName)
 	dataFile, err := os.Open(dataPath)
 	if err != nil {
-		return indexer.Document{}, err
+		return nil, err
 	}
-	defer dataFile.Close()
-	_, err = dataFile.Seek(int64(pos.Offset), io.SeekStart)
+	return dataFile, nil
+}
+
+func readFrom(file *os.File, pos Position) ([]byte, error) {
+	_, err := file.Seek(int64(pos.Offset), io.SeekStart)
+	if err != nil {
+		return nil, err
+	}
+	docBytes := make([]byte, pos.Len)
+	n, err := file.Read(docBytes)
+	if err != nil && err != io.EOF {
+		return nil, err
+	}
+	return docBytes[:n], nil
+}
+
+func unmarshalDoc(docBytes []byte) (indexer.Document, error) {
+	var doc indexer.Document
+	err := json.Unmarshal(docBytes, &doc)
 	if err != nil {
 		return indexer.Document{}, err
 	}
-	docBytes := make([]byte, pos.Len)
-	n, err := dataFile.Read(docBytes)
-	if err != nil && err != io.EOF {
+	return doc, nil
+}
+
+func open(config *Config, source, id string, boltStore *BoltStore) (indexer.Document, error) {
+	pos, err := boltStore.GetPosition(id)
+	if err != nil {
 		return indexer.Document{}, err
 	}
-	docBytes = docBytes[:n]
 
-	var doc indexer.Document
-	err = json.Unmarshal(docBytes, &doc)
+	dataFile, err := openDataFile(config, source)
+	if err != nil {
+		return indexer.Document{}, err
+	}
+	defer dataFile.Close()
+
+	docBytes, err := readFrom(dataFile, pos)
+	if err != nil {
+		return indexer.Document{}, err
+	}
+
+	doc, err := unmarshalDoc(docBytes)
 	if err != nil {
 		return indexer.Document{}, err
 	}
@@ -63,9 +83,7 @@ func commandOpen(config *Config, args []string) error {
 		return fmt.Errorf("open expects a source and a doc_id")
 	}
 
-	indexFileName := fmt.Sprintf("%s%s", args[0], ".db")
-	indexPath := filepath.Join(config.Root, "index", indexFileName)
-	db, err := bolt.Open(indexPath, 0600, nil)
+	db, err := openIndex(config, args[0])
 	if err != nil {
 		return err
 	}
