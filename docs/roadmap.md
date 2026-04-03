@@ -38,4 +38,6 @@
 
 20. **Incremental indexing:** Only index data that has been modified.
 
+21. **Concurrent indexing:** Index multiple documents concurrently to speed up indexing.
 
+22. **fzf integration:** Allows live search via fzf scripting.

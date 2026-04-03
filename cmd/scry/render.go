@@ -83,7 +83,7 @@ func render(content string, pager string) error {
 		return fmt.Errorf("cannot find pager '%s' in PATH", pagerArgs[0])
 	}
 	cmd := exec.Command(pagerArgs[0], pagerArgs[1:]...)
-	fmt.Printf("Launching '%s' to view content...\n", cmd.String())
+	fmt.Fprintf(os.Stderr, "Launching '%s' to view content...\n", cmd.String())
 	formattedContent, err := formatMdToAnsi(content)
 	if err != nil {
 		return err

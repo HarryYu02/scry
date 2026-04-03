@@ -122,10 +122,6 @@ func Index[T DocumentStore](docsStore []T) (TermFreqIndex, error) {
 }
 
 func Search(index IndexStore, query string, count int) ([]string, error) {
-	if count == 0 {
-		return nil, fmt.Errorf("Search expects count > 0")
-	}
-
 	terms := strings.Fields(strings.ToUpper(query))
 	if len(terms) == 0 {
 		return nil, fmt.Errorf("Search expects query contains non-whitespace character")
@@ -190,5 +186,8 @@ func Search(index IndexStore, query string, count int) ([]string, error) {
 	})
 
 	numResult := min(len(ids), count)
+	if count == 0 {
+		numResult = len(ids)
+	}
 	return ids[:numResult], nil
 }

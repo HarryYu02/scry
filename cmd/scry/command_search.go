@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
-	"io"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -14,6 +13,42 @@ import (
 	bolt "go.etcd.io/bbolt"
 )
 
+type Meta struct {
+	ID    string `json:"id"`
+	Title string `json:"title"`
+}
+
+func promptSelectID(query string, ids []string, boltStore *BoltStore, numResult int) (string, error) {
+	fmt.Fprintf(os.Stderr, "\nSearch query: %s\n\n", query)
+	fmt.Fprintln(os.Stderr, "Results:")
+	for i, id := range ids {
+		title, err := boltStore.GetTitle(id)
+		if err != nil {
+			return "", err
+		}
+		fmt.Fprintf(os.Stderr, "%0.2d: %s\n", i+1, title)
+	}
+	fmt.Fprintf(os.Stderr, "\nSelect by typing the number 1-%d (0 to cancel)\n> ", numResult)
+	var input string
+	_, err := fmt.Scanln(&input)
+	if err != nil {
+		return "", err
+	}
+	choice, err := strconv.Atoi(input)
+	if err != nil {
+		return "", err
+	}
+	if choice < 0 || choice > len(ids) {
+		return "", fmt.Errorf("choice out of bound")
+	}
+	if choice == 0 {
+		fmt.Fprintf(os.Stderr, "Cancel search\n")
+		return "", nil
+	}
+
+	return ids[choice-1], nil
+}
+
 func commandSearch(config *Config, args []string) error {
 	searchCmd := flag.NewFlagSet("search", flag.ExitOnError)
 	searchCmd.Usage = func() {
@@ -22,6 +57,8 @@ func commandSearch(config *Config, args []string) error {
 
 	urlFlag := searchCmd.Bool("url", false, config.Commands["search"].flags["url"])
 	stdoutFlag := searchCmd.Bool("stdout", false, config.Commands["search"].flags["stdout"])
+	docsFlag := searchCmd.Bool("docs", false, config.Commands["search"].flags["docs"])
+	metaFlag := searchCmd.Bool("meta", false, config.Commands["search"].flags["meta"])
 	nFlag := searchCmd.Int("n", 10, config.Commands["search"].flags["n"])
 
 	searchCmd.Parse(args)
@@ -49,82 +86,72 @@ func commandSearch(config *Config, args []string) error {
 		return err
 	}
 
-	fmt.Fprintf(os.Stderr, "\nSearch query: %s\n\n", query)
-	fmt.Fprintln(os.Stderr, "Results:")
-	for i, id := range ids {
-		title, err := boltStore.GetTitle(id)
-		if err != nil {
-			return err
+	if *docsFlag {
+		for _, id := range ids {
+			title, err := boltStore.GetTitle(id)
+			if err != nil {
+				return err
+			}
+			if *metaFlag {
+				res := Meta{
+					ID:    id,
+					Title: title,
+				}
+				resBytes, err := json.Marshal(&res)
+				if err != nil {
+					return err
+				}
+				fmt.Printf("%v\n", string(resBytes))
+			} else {
+				fmt.Println(id)
+			}
 		}
-		fmt.Fprintf(os.Stderr, "%0.2d: %s\n", i+1, title)
-	}
-	fmt.Fprintf(os.Stderr, "\nSelect by typing the number 1-%d (0 to cancel)\n> ", numResult)
-	var input string
-	_, err = fmt.Scanln(&input)
-	if err != nil {
-		return err
-	}
-	choice, err := strconv.Atoi(input)
-	if err != nil {
-		return err
-	}
-	if choice < 0 || choice > len(ids) {
-		return fmt.Errorf("choice out of bound")
-	}
-	if choice == 0 {
-		fmt.Fprintf(os.Stderr, "Cancel search\n")
 		return nil
 	}
 
-	selectedID := ids[choice-1]
-	var pos Position
-	boltStore.db.View(func(tx *bolt.Tx) error {
-		posBucket := tx.Bucket([]byte("Position"))
-		if posBucket == nil {
-			return fmt.Errorf("posBucket not found in index")
-		}
-		posBytes := posBucket.Get([]byte(selectedID))
-		if posBytes == nil {
-			return fmt.Errorf("cannot find %s in posBucket", selectedID)
-		}
+	selectedID, err := promptSelectID(query, ids, &boltStore, numResult)
+	if err != nil {
+		return err
+	}
 
-		err := json.Unmarshal(posBytes, &pos)
-		if err != nil {
-			return err
-		}
+	doc, err := open(config, args[0], selectedID, &boltStore)
+	if err != nil {
+		return err
+	}
 
+	if *metaFlag {
+		if *urlFlag {
+			res := struct {
+				ID    string `json:"id"`
+				Title string `json:"title"`
+				URL   string `json:"url"`
+			}{
+				ID:    doc.ID,
+				Title: doc.Title,
+				URL:   doc.URL,
+			}
+			resBytes, err := json.Marshal(&res)
+			if err != nil {
+				return err
+			}
+			fmt.Println(string(resBytes))
+		} else {
+			res := Meta{
+				ID:    doc.ID,
+				Title: doc.Title,
+			}
+			resBytes, err := json.Marshal(&res)
+			if err != nil {
+				return err
+			}
+			fmt.Println(string(resBytes))
+		}
 		return nil
-	})
-
-	dataFileName := fmt.Sprintf("%s%s", args[0], ".jsonl")
-	dataPath := filepath.Join(config.Root, "data", dataFileName)
-	dataFile, err := os.Open(dataPath)
-	if err != nil {
-		return err
-	}
-	defer dataFile.Close()
-	_, err = dataFile.Seek(int64(pos.Offset), io.SeekStart)
-	if err != nil {
-		return err
-	}
-	docBytes := make([]byte, pos.Len)
-	n, err := dataFile.Read(docBytes)
-	if err != nil && err != io.EOF {
-		return err
-	}
-	docBytes = docBytes[:n]
-
-	var doc indexer.Document
-	err = json.Unmarshal(docBytes, &doc)
-	if err != nil {
-		return err
-	}
-
-	if *urlFlag {
-		fmt.Print(doc.URL)
+	} else if *urlFlag {
+		fmt.Println(doc.URL)
 		return nil
 	} else if *stdoutFlag {
-		fmt.Print(doc.Content)
+		fmt.Println(doc.Content)
 		return nil
 	}
 
