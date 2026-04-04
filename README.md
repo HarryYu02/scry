@@ -87,6 +87,7 @@ Here are some useful integrations:
 1. To add tab completion to your shell:
 ```bash
 eval "$(scry completion zsh)" # Add this to your .zshrc
+eval "$(scry completion bash)" # Add this to your .bashrc
 ```
 
 2. To use `fzf` as a selector for Scry:

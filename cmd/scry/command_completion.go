@@ -1,6 +1,9 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"strings"
+)
 
 func genZshComp(config *Config) string {
 	commands := "\n"
@@ -11,7 +14,6 @@ func genZshComp(config *Config) string {
 
 	searchFlags := "\n"
 	for _, flagName := range sortStringMap(config.Commands["search"].flags) {
-		// '--docs[Only list results]' \
 		flagDesc := config.Commands["search"].flags[flagName]
 		searchFlags += fmt.Sprintf("                        '--%s[%s]' \\\n", flagName, flagDesc)
 	}
@@ -85,6 +87,52 @@ compdef _scry scry
 	return completion
 }
 
+func genBashComp(config *Config) string {
+	commands := strings.Join(sortStringMap(config.Commands), " ")
+	searchFlags := sortStringMap(config.Commands["search"].flags)
+	for i, flag := range searchFlags {
+		searchFlags[i] = "--" + flag
+	}
+	searchFlagsStr := strings.Join(searchFlags, " ")
+
+	completion := `
+_scry_completions() {
+	local cur prev words cword
+
+    words=("${COMP_WORDS[@]}")
+    cword=$COMP_CWORD
+    cur="${words[cword]}"
+    prev="${words[cword-1]}"
+
+	if [[ $cword -eq 1 ]]; then
+        local opts="` + commands + `"
+        COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
+        return 0
+    fi
+
+	local cmd="${words[1]}"
+
+    case "${cmd}" in
+        search)
+            local search_opts="` + searchFlagsStr + ` $(scry list 2>/dev/null)"
+            COMPREPLY=( $(compgen -W "${search_opts}" -- "${cur}") )
+            ;;
+        open)
+            local sources=$(scry list 2>/dev/null)
+            COMPREPLY=( $(compgen -W "${sources}" -- "${cur}") )
+            ;;
+        remove)
+            local sources=$(scry list 2>/dev/null)
+            COMPREPLY=( $(compgen -W "${sources}" -- "${cur}") )
+            ;;
+    esac
+}
+
+complete -F _scry_completions scry
+`
+	return completion
+}
+
 func commandCompletion(config *Config, args []string) error {
 	if len(args) < 1 {
 		return fmt.Errorf("completion expects a shell")
@@ -94,6 +142,8 @@ func commandCompletion(config *Config, args []string) error {
 	switch shell {
 	case "zsh":
 		fmt.Print(genZshComp(config))
+	case "bash":
+		fmt.Print(genBashComp(config))
 	default:
 		return fmt.Errorf("unrecognized shell")
 	}
