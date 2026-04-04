@@ -77,7 +77,7 @@ func getCommands() map[string]Command {
 			name:        "remove",
 			description: "Remove an existing index",
 			usage:       "scry remove <source>",
-			callback:    nil,
+			callback:    commandRemove,
 		},
 	}
 }

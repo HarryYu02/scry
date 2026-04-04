@@ -2,7 +2,15 @@ package main
 
 import (
 	"fmt"
+	"maps"
+	"slices"
 )
+
+func sortStringMap[T any](m map[string]T) []string {
+	keys := slices.Collect(maps.Keys(m))
+	slices.Sort(keys)
+	return keys
+}
 
 func padRight(s string, c byte, l int) string {
 	if len(s) >= l {
@@ -38,7 +46,8 @@ func commandHelp(config *Config, args []string) error {
 			for flagName := range subCommand.flags {
 				lenLongestFlagName = max(lenLongestFlagName, len(flagName))
 			}
-			for flagName, flagDesc := range subCommand.flags {
+			for _, flagName := range sortStringMap(subCommand.flags) {
+				flagDesc := subCommand.flags[flagName]
 				paddedName := padRight(flagName, ' ', lenLongestFlagName+1)
 				fmt.Printf("\t--%s-- %s\n", paddedName, flagDesc)
 			}
@@ -58,7 +67,8 @@ func commandHelp(config *Config, args []string) error {
 		for command := range config.Commands {
 			lenLongestCommand = max(lenLongestCommand, len(command))
 		}
-		for _, command := range config.Commands {
+		for _, key := range sortStringMap(config.Commands) {
+			command := config.Commands[key]
 			paddedCommand := padRight(command.name, ' ', lenLongestCommand+1)
 			fmt.Printf("\t%s\t%s\n", paddedCommand, command.description)
 		}

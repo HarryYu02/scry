@@ -76,6 +76,8 @@ Available commands:
 - index
 - search
 - open
+- list
+- remove
 
 Use "scry help \<command\>" for more information about a command.
 
