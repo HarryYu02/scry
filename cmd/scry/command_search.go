@@ -79,7 +79,7 @@ func commandSearch(config *Config, args []string) error {
 	query := strings.Join(args[1:], " ")
 	numResult := *nFlag
 
-	db, err := openIndex(config, source)
+	db, err := openIndex(config, source, false)
 	if err != nil {
 		return err
 	}

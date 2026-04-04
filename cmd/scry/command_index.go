@@ -48,10 +48,9 @@ func commandIndex(config *Config, args []string) error {
 	if len(args) < 1 {
 		return fmt.Errorf("index expects a source")
 	}
+	source := args[0]
 
-	source := fmt.Sprintf("%s%s", args[0], ".jsonl")
-	sourcePath := filepath.Join(config.Root, "data", source)
-	dataFile, err := os.Open(sourcePath)
+	dataFile, err := openDataFile(config, source)
 	if err != nil {
 		return err
 	}
@@ -75,21 +74,16 @@ func commandIndex(config *Config, args []string) error {
 		}
 	}
 
-	indexFileName := fmt.Sprintf("%s%s", args[0], ".db")
-	indexPath := filepath.Join(indexDir, indexFileName)
-	db, err := bolt.Open(indexPath, 0600, nil)
+	db, err := openIndex(config, source, true)
 	if err != nil {
 		return err
 	}
 	defer db.Close()
 
 	err = db.Update(func(tx *bolt.Tx) error {
-		posBucket := tx.Bucket([]byte("Position"))
-		if posBucket == nil {
-			posBucket, err = tx.CreateBucket([]byte("Position"))
-			if err != nil {
-				return fmt.Errorf("create bucket: %s", err)
-			}
+		posBucket, err := openOrCreateBucket(tx, "Position")
+		if err != nil {
+			return err
 		}
 		for _, docWithPos := range sourceDocs {
 			posBytes, err := json.Marshal(Position{
@@ -105,12 +99,9 @@ func commandIndex(config *Config, args []string) error {
 			}
 		}
 
-		titleBucket := tx.Bucket([]byte("Title"))
-		if titleBucket == nil {
-			titleBucket, err = tx.CreateBucket([]byte("Title"))
-			if err != nil {
-				return fmt.Errorf("create bucket: %s", err)
-			}
+		titleBucket, err := openOrCreateBucket(tx, "Title")
+		if err != nil {
+			return err
 		}
 		for id, title := range index.IDTitleMap {
 			err := titleBucket.Put([]byte(id), []byte(title))
@@ -119,12 +110,9 @@ func commandIndex(config *Config, args []string) error {
 			}
 		}
 
-		wordCountBucket := tx.Bucket([]byte("WordCount"))
-		if wordCountBucket == nil {
-			wordCountBucket, err = tx.CreateBucket([]byte("WordCount"))
-			if err != nil {
-				return fmt.Errorf("create bucket: %s", err)
-			}
+		wordCountBucket, err := openOrCreateBucket(tx, "WordCount")
+		if err != nil {
+			return err
 		}
 		for term, freq := range index.AllTFMap {
 			freqStr := strconv.Itoa(freq)
@@ -134,12 +122,9 @@ func commandIndex(config *Config, args []string) error {
 			}
 		}
 
-		IDTFBucket := tx.Bucket([]byte("IDTF"))
-		if IDTFBucket == nil {
-			IDTFBucket, err = tx.CreateBucket([]byte("IDTF"))
-			if err != nil {
-				return fmt.Errorf("create bucket: %s", err)
-			}
+		IDTFBucket, err := openOrCreateBucket(tx, "IDTF")
+		if err != nil {
+			return err
 		}
 		for stem, idTFMap := range index.StemIDTFMap {
 			mapBytes, err := json.Marshal(idTFMap)

@@ -24,16 +24,18 @@ func fileExists(path string) (bool, error) {
     return false, err
 }
 
-func openIndex(config *Config, source string) (*bolt.DB, error) {
+func openIndex(config *Config, source string, createIfNotExist bool) (*bolt.DB, error) {
 	indexFileName := fmt.Sprintf("%s%s", source, ".db")
 	indexPath := filepath.Join(config.Root, "index", indexFileName)
 
-	indexExists, err := fileExists(indexPath)
-	if err != nil {
-		return nil, err
-	}
-	if !indexExists {
-		return nil, fmt.Errorf("index not found, please run 'scry index <source>' first")
+	if !createIfNotExist {
+		indexExists, err := fileExists(indexPath)
+		if err != nil {
+			return nil, err
+		}
+		if !indexExists {
+			return nil, fmt.Errorf("index not found, please run 'scry index <source>' first")
+		}
 	}
 
 	db, err := bolt.Open(indexPath, 0600, nil)
@@ -105,7 +107,7 @@ func commandOpen(config *Config, args []string) error {
 		return fmt.Errorf("open expects a source and a doc_id")
 	}
 
-	db, err := openIndex(config, args[0])
+	db, err := openIndex(config, args[0], false)
 	if err != nil {
 		return err
 	}

@@ -55,6 +55,9 @@ func main() {
 		log.Fatal("unknown command")
 	}
 
+	if command.callback == nil {
+		log.Fatal("ERROR: callback for the command is not defined")
+	}
 	err = command.callback(config, args)
 	if err != nil {
 		log.Fatal("ERROR: ", err)

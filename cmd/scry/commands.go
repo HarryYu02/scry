@@ -67,5 +67,17 @@ func getCommands() map[string]Command {
 			usage:       "scry open <source> <doc_id>",
 			callback:    commandOpen,
 		},
+		"list": {
+			name:        "list",
+			description: "List out all created indexes",
+			usage:       "scry list",
+			callback:    nil,
+		},
+		"remove": {
+			name:        "remove",
+			description: "Remove an existing index",
+			usage:       "scry remove <source>",
+			callback:    nil,
+		},
 	}
 }

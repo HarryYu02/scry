@@ -12,6 +12,18 @@ type BoltStore struct {
 	db *bolt.DB
 }
 
+func openOrCreateBucket(tx *bolt.Tx, name string) (*bolt.Bucket, error) {
+	bucket := tx.Bucket([]byte(name))
+	if bucket == nil {
+		var err error
+		bucket, err = tx.CreateBucket([]byte(name))
+		if err != nil {
+			return nil, fmt.Errorf("create bucket: %s", err)
+		}
+	}
+	return bucket, nil
+}
+
 func (b *BoltStore) GetIDTFMap(stem string) (map[string]float64, error) {
 	var idTFMap map[string]float64
 	err := b.db.View(func(tx *bolt.Tx) error {
