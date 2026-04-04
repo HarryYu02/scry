@@ -42,8 +42,8 @@
 
 22. **Concurrent indexing:** Index multiple documents concurrently to speed up indexing.
 
-23. **Deamon mode:** Run Scry as a daemon / server.
+23. **Deamon mode:** Run Scry as a daemon / server an a `scryd` binary.
 
-24. **List command:** Implement a list command to view / manage indexes.
+24. ~~**List command:** Implement a list command to view / manage indexes.~~
 
 25. **Shell integration:** Add completion for shell integration.

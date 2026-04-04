@@ -8,7 +8,7 @@ import (
 
 func commandRemove(config *Config, args []string) error {
 	if len(args) < 1 {
-		return fmt.Errorf("index expects a source")
+		return fmt.Errorf("remove expects a source")
 	}
 	source := args[0]
 

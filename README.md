@@ -78,10 +78,18 @@ Available commands:
 - open
 - list
 - remove
+- completion
 
 Use "scry help \<command\>" for more information about a command.
 
-To use `fzf` as a selector for Scry:
+Here are some useful integrations:
+
+1. To add tab completion to your shell:
+```bash
+eval "$(scry completion zsh)" # Add this to your .zshrc
+```
+
+2. To use `fzf` as a selector for Scry:
 ```bash
 ./scripts/scry-fzf.sh bg3wiki
 ```

@@ -79,5 +79,11 @@ func getCommands() map[string]Command {
 			usage:       "scry remove <source>",
 			callback:    commandRemove,
 		},
+		"completion": {
+			name:        "completion",
+			description: "Generate shell completion",
+			usage:       "scry completion <shell>",
+			callback:    commandCompletion,
+		},
 	}
 }
