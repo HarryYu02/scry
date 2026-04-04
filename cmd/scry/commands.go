@@ -71,7 +71,7 @@ func getCommands() map[string]Command {
 			name:        "list",
 			description: "List out all created indexes",
 			usage:       "scry list",
-			callback:    nil,
+			callback:    commandList,
 		},
 		"remove": {
 			name:        "remove",
