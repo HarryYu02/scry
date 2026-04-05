@@ -13,4 +13,6 @@ fzf --disabled \
     --with-nth 2 \
     --border="rounded" \
     --border-label="$1" \
+    --preview "scry open $1 {1}" \
+    --preview-window="right:50%:wrap" \
     | cut -f1 | xargs -r scry open $1

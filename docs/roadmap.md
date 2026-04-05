@@ -30,20 +30,22 @@
 
 16. ~~**fzf integration:** Allows live search via fzf scripting.~~
 
-17. **Custom Scraper Documentation**: Write a clear tutorial in docs/ detailing how contributors can inherit from the base Python scraper class to add support for their own game wikis.
+17. ~~**List command:** Implement a list command to view / manage indexes.~~
 
-18. **Rolling Dataset Releases:** Create a `gh` CLI script (or GitHub Action) to automatically upload freshly scraped `.jsonl.gz` datasets to a rolling `latest-datasets` release tag, preventing git history bloat while keeping users up-to-date.
+18. ~~**Shell integration:** Add completion for shell integration.~~
 
-19. **Structured Logging:** Implement standard library logging (Go `slog`, Python `logging`). Route all logs to `stderr` to keep `stdout` pure for terminal piping.
+19. **Custom Scraper Documentation**: Write a clear tutorial in docs/ detailing how contributors can inherit from the base Python scraper class to add support for their own game wikis.
 
-20. **Comprehensive Testing:** Implement unit and integration tests across all three core components (Python Scraper, Go Indexer, and Go Search CLI) and add a `make test` target to execute them all.
+20. **Rolling Dataset Releases:** Create a `gh` CLI script (or GitHub Action) to automatically upload freshly scraped `.jsonl.gz` datasets to a rolling `latest-datasets` release tag, preventing git history bloat while keeping users up-to-date.
 
-21. **Incremental indexing:** Only index data that has been modified.
+21. **Structured Logging:** Implement standard library logging (Go `slog`, Python `logging`). Route all logs to `stderr` to keep `stdout` pure for terminal piping.
 
-22. **Concurrent indexing:** Index multiple documents concurrently to speed up indexing.
+22. **Comprehensive Testing:** Implement unit and integration tests across all three core components (Python Scraper, Go Indexer, and Go Search CLI) and add a `make test` target to execute them all.
 
-23. **Deamon mode:** Run Scry as a daemon / server an a `scryd` binary.
+23. **Incremental indexing:** Only index data that has been modified.
 
-24. ~~**List command:** Implement a list command to view / manage indexes.~~
+24. **Concurrent indexing:** Index multiple documents concurrently to speed up indexing.
 
-25. **Shell integration:** Add completion for shell integration.
+25. **Deamon mode:** Run Scry as a daemon / server an a `scryd` binary.
+
+26. **Compress index:** Explore options to compress the index to make the file size smaller. Can sacrifice a little bit of performance.
