@@ -118,7 +118,7 @@ func (b *BoltStore) GetWordCount(word string) (int, error) {
 	return count, nil
 }
 
-func (b *BoltStore)GetPosition(docID string) (Position, error) {
+func (b *BoltStore) GetPosition(docID string) (Position, error) {
 	var pos Position
 	err := b.DB.View(func(tx *bolt.Tx) error {
 		posBucket := tx.Bucket([]byte("Position"))
@@ -142,4 +142,3 @@ func (b *BoltStore)GetPosition(docID string) (Position, error) {
 	}
 	return pos, nil
 }
-

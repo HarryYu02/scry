@@ -1,9 +1,5 @@
 package cli
 
-import (
-	"github.com/HarryYu02/scry/internal/indexer"
-)
-
 type Config struct {
 	Root       string
 	MaxBufSize int
@@ -17,16 +13,6 @@ type Command struct {
 	Usage       string
 	Flags       map[string]string
 	Callback    func(*Config, []string) error
-}
-
-type DocumentWithPos struct {
-	document   indexer.Document
-	byteOffset int
-	length     int
-}
-
-func (d DocumentWithPos) GetDocument() (indexer.Document, error) {
-	return d.document, nil
 }
 
 func GetCommands() map[string]Command {

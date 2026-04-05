@@ -27,16 +27,16 @@ _scry() {
         command)
             local -a cmds
             cmds=(` +
-	commands +
-`            )
+		commands +
+		`            )
             _describe -t commands 'scry command' cmds
             ;;
         args)
             case $line[1] in
                 search)
                     _arguments \` +
-	searchFlags +
-`                        '1:sources:->sources' \
+		searchFlags +
+		`                        '1:sources:->sources' \
                         '2:query: '
 
                     if [[ "$state" == "sources" ]]; then

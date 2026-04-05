@@ -13,6 +13,16 @@ import (
 	bolt "go.etcd.io/bbolt"
 )
 
+type DocumentWithPos struct {
+	document   indexer.Document
+	byteOffset int
+	length     int
+}
+
+func (d DocumentWithPos) GetDocument() (indexer.Document, error) {
+	return d.document, nil
+}
+
 func readDocs(config *Config, dataFile *os.File) ([]DocumentWithPos, error) {
 	sourceDocs := make([]DocumentWithPos, 0)
 	fileScanner := bufio.NewScanner(dataFile)
@@ -43,7 +53,6 @@ func readDocs(config *Config, dataFile *os.File) ([]DocumentWithPos, error) {
 
 	return sourceDocs, nil
 }
-
 
 func commandIndex(config *Config, args []string) error {
 	if len(args) < 1 {
