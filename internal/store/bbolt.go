@@ -1,4 +1,4 @@
-package main
+package store
 
 import (
 	"encoding/json"
@@ -8,11 +8,16 @@ import (
 	bolt "go.etcd.io/bbolt"
 )
 
-type BoltStore struct {
-	db *bolt.DB
+type Position struct {
+	Offset int
+	Len    int
 }
 
-func openOrCreateBucket(tx *bolt.Tx, name string) (*bolt.Bucket, error) {
+type BoltStore struct {
+	DB *bolt.DB
+}
+
+func OpenOrCreateBucket(tx *bolt.Tx, name string) (*bolt.Bucket, error) {
 	bucket := tx.Bucket([]byte(name))
 	if bucket == nil {
 		var err error
@@ -26,7 +31,7 @@ func openOrCreateBucket(tx *bolt.Tx, name string) (*bolt.Bucket, error) {
 
 func (b *BoltStore) GetIDTFMap(stem string) (map[string]float64, error) {
 	var idTFMap map[string]float64
-	err := b.db.View(func(tx *bolt.Tx) error {
+	err := b.DB.View(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte("IDTF"))
 		if bucket == nil {
 			return fmt.Errorf("IDTF bucket not found")
@@ -50,7 +55,7 @@ func (b *BoltStore) GetIDTFMap(stem string) (map[string]float64, error) {
 
 func (b *BoltStore) GetTitle(docID string) (string, error) {
 	var title string
-	err := b.db.View(func(tx *bolt.Tx) error {
+	err := b.DB.View(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte("Title"))
 		if bucket == nil {
 			return fmt.Errorf("Title bucket not found")
@@ -71,7 +76,7 @@ func (b *BoltStore) GetTitle(docID string) (string, error) {
 
 func (b *BoltStore) GetWords() ([]string, error) {
 	words := make([]string, 0)
-	b.db.View(func(tx *bolt.Tx) error {
+	b.DB.View(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte("WordCount"))
 		if bucket == nil {
 			return fmt.Errorf("WordCount bucket not found")
@@ -89,7 +94,7 @@ func (b *BoltStore) GetWords() ([]string, error) {
 
 func (b *BoltStore) GetWordCount(word string) (int, error) {
 	var count int
-	err := b.db.View(func(tx *bolt.Tx) error {
+	err := b.DB.View(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte("WordCount"))
 		if bucket == nil {
 			return fmt.Errorf("WordCount bucket not found")
@@ -115,7 +120,7 @@ func (b *BoltStore) GetWordCount(word string) (int, error) {
 
 func (b *BoltStore)GetPosition(docID string) (Position, error) {
 	var pos Position
-	err := b.db.View(func(tx *bolt.Tx) error {
+	err := b.DB.View(func(tx *bolt.Tx) error {
 		posBucket := tx.Bucket([]byte("Position"))
 		if posBucket == nil {
 			return fmt.Errorf("posBucket not found in index")

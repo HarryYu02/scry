@@ -1,4 +1,4 @@
-package main
+package cli
 
 import (
 	"encoding/json"
@@ -10,6 +10,8 @@ import (
 	"path/filepath"
 
 	"github.com/HarryYu02/scry/internal/indexer"
+	"github.com/HarryYu02/scry/internal/render"
+	"github.com/HarryYu02/scry/internal/store"
 	bolt "go.etcd.io/bbolt"
 )
 
@@ -55,7 +57,7 @@ func openDataFile(config *Config, source string) (*os.File, error) {
 	return dataFile, nil
 }
 
-func readFrom(file *os.File, pos Position) ([]byte, error) {
+func readFrom(file *os.File, pos store.Position) ([]byte, error) {
 	_, err := file.Seek(int64(pos.Offset), io.SeekStart)
 	if err != nil {
 		return nil, err
@@ -77,7 +79,7 @@ func unmarshalDoc(docBytes []byte) (indexer.Document, error) {
 	return doc, nil
 }
 
-func open(config *Config, source, id string, boltStore *BoltStore) (indexer.Document, error) {
+func open(config *Config, source, id string, boltStore *store.BoltStore) (indexer.Document, error) {
 	pos, err := boltStore.GetPosition(id)
 	if err != nil {
 		return indexer.Document{}, err
@@ -113,8 +115,8 @@ func commandOpen(config *Config, args []string) error {
 	}
 	defer db.Close()
 
-	boltStore := BoltStore{
-		db: db,
+	boltStore := store.BoltStore{
+		DB: db,
 	}
 
 	doc, err := open(config, args[0], args[1], &boltStore)
@@ -122,7 +124,7 @@ func commandOpen(config *Config, args []string) error {
 		return err
 	}
 
-	err = render(doc.Content, config.Pager)
+	err = render.Render(doc.Content, config.Pager)
 	if err != nil {
 		return err
 	}

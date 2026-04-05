@@ -1,4 +1,4 @@
-package main
+package cli
 
 import (
 	"fmt"
@@ -37,17 +37,17 @@ func commandHelp(config *Config, args []string) error {
 		fmt.Println("")
 		fmt.Println("Usage:")
 		fmt.Println("")
-		fmt.Println("\t", subCommand.usage)
+		fmt.Println("\t", subCommand.Usage)
 		fmt.Println("")
-		if len(subCommand.flags) > 0 {
+		if len(subCommand.Flags) > 0 {
 			fmt.Println("The flags are:")
 			fmt.Println("")
 			lenLongestFlagName := 0
-			for flagName := range subCommand.flags {
+			for flagName := range subCommand.Flags {
 				lenLongestFlagName = max(lenLongestFlagName, len(flagName))
 			}
-			for _, flagName := range sortStringMap(subCommand.flags) {
-				flagDesc := subCommand.flags[flagName]
+			for _, flagName := range sortStringMap(subCommand.Flags) {
+				flagDesc := subCommand.Flags[flagName]
 				paddedName := padRight(flagName, ' ', lenLongestFlagName+1)
 				fmt.Printf("\t--%s-- %s\n", paddedName, flagDesc)
 			}
@@ -69,8 +69,8 @@ func commandHelp(config *Config, args []string) error {
 		}
 		for _, key := range sortStringMap(config.Commands) {
 			command := config.Commands[key]
-			paddedCommand := padRight(command.name, ' ', lenLongestCommand+1)
-			fmt.Printf("\t%s\t%s\n", paddedCommand, command.description)
+			paddedCommand := padRight(command.Name, ' ', lenLongestCommand+1)
+			fmt.Printf("\t%s\t%s\n", paddedCommand, command.Description)
 		}
 		fmt.Println("")
 		fmt.Println("Use \"scry help <command>\" for more information about a command.")

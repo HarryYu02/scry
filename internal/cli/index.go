@@ -1,4 +1,4 @@
-package main
+package cli
 
 import (
 	"bufio"
@@ -9,6 +9,7 @@ import (
 	"strconv"
 
 	"github.com/HarryYu02/scry/internal/indexer"
+	"github.com/HarryYu02/scry/internal/store"
 	bolt "go.etcd.io/bbolt"
 )
 
@@ -81,12 +82,12 @@ func commandIndex(config *Config, args []string) error {
 	defer db.Close()
 
 	err = db.Update(func(tx *bolt.Tx) error {
-		posBucket, err := openOrCreateBucket(tx, "Position")
+		posBucket, err := store.OpenOrCreateBucket(tx, "Position")
 		if err != nil {
 			return err
 		}
 		for _, docWithPos := range sourceDocs {
-			posBytes, err := json.Marshal(Position{
+			posBytes, err := json.Marshal(store.Position{
 				Offset: docWithPos.byteOffset,
 				Len:    docWithPos.length,
 			})
@@ -99,7 +100,7 @@ func commandIndex(config *Config, args []string) error {
 			}
 		}
 
-		titleBucket, err := openOrCreateBucket(tx, "Title")
+		titleBucket, err := store.OpenOrCreateBucket(tx, "Title")
 		if err != nil {
 			return err
 		}
@@ -110,7 +111,7 @@ func commandIndex(config *Config, args []string) error {
 			}
 		}
 
-		wordCountBucket, err := openOrCreateBucket(tx, "WordCount")
+		wordCountBucket, err := store.OpenOrCreateBucket(tx, "WordCount")
 		if err != nil {
 			return err
 		}
@@ -122,7 +123,7 @@ func commandIndex(config *Config, args []string) error {
 			}
 		}
 
-		IDTFBucket, err := openOrCreateBucket(tx, "IDTF")
+		IDTFBucket, err := store.OpenOrCreateBucket(tx, "IDTF")
 		if err != nil {
 			return err
 		}

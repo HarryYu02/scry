@@ -7,6 +7,8 @@ import (
 	"runtime"
 	"runtime/pprof"
 	"strings"
+
+	"github.com/HarryYu02/scry/internal/cli"
 )
 
 const ROOT_PATH = "~/.local/share/scry"
@@ -44,10 +46,10 @@ func main() {
 		root = strings.Replace(root, "~", homeDir, 1)
 	}
 
-	config := &Config{
+	config := &cli.Config{
 		Root:       root,
 		MaxBufSize: MAX_BUF_SIZE,
-		Commands:   getCommands(),
+		Commands:   cli.GetCommands(),
 		Pager:      "less -R",
 	}
 	command, ok := config.Commands[cmd]
@@ -55,10 +57,10 @@ func main() {
 		log.Fatal("unknown command")
 	}
 
-	if command.callback == nil {
+	if command.Callback == nil {
 		log.Fatal("ERROR: callback for the command is not defined")
 	}
-	err = command.callback(config, args)
+	err = command.Callback(config, args)
 	if err != nil {
 		log.Fatal("ERROR: ", err)
 	}

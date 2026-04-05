@@ -49,3 +49,7 @@
 25. **Deamon mode:** Run Scry as a daemon / server an a `scryd` binary.
 
 26. **Compress index:** Explore options to compress the index to make the file size smaller. Can sacrifice a little bit of performance.
+
+27. **Sync command:** Implement a `sync` command to fetch the latest data.tar.gz from GitHub release page.
+
+28. **Scry index loading UI:** Implement a UI for indexing.

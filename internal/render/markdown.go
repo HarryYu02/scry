@@ -1,4 +1,4 @@
-package main
+package render
 
 import (
 	"fmt"
@@ -73,7 +73,7 @@ func checkExecExist(name string) bool {
 	return err == nil
 }
 
-func render(content string, pager string) error {
+func Render(content string, pager string) error {
 	pagerArgs := strings.Fields(pager)
 	if len(pagerArgs) < 1 {
 		return fmt.Errorf("render failed: pager not provided")

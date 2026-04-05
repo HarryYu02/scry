@@ -1,4 +1,4 @@
-package main
+package cli
 
 import (
 	"encoding/json"
@@ -9,6 +9,8 @@ import (
 	"strings"
 
 	"github.com/HarryYu02/scry/internal/indexer"
+	"github.com/HarryYu02/scry/internal/render"
+	"github.com/HarryYu02/scry/internal/store"
 )
 
 type Meta struct {
@@ -27,7 +29,7 @@ func parseChoice(input string, numChoice int) (int, error) {
 	return choice, nil
 }
 
-func promptSelectID(query string, ids []string, boltStore *BoltStore, numResult int) (string, error) {
+func promptSelectID(query string, ids []string, boltStore *store.BoltStore, numResult int) (string, error) {
 	fmt.Fprintf(os.Stderr, "\nSearch query: %s\n\n", query)
 	fmt.Fprintln(os.Stderr, "Results:")
 	for i, id := range ids {
@@ -51,7 +53,6 @@ func promptSelectID(query string, ids []string, boltStore *BoltStore, numResult 
 	}
 
 	if choice == 0 {
-		fmt.Fprintf(os.Stderr, "Cancel search\n")
 		return "", nil
 	}
 	return ids[choice-1], nil
@@ -63,11 +64,11 @@ func commandSearch(config *Config, args []string) error {
 		commandHelp(config, []string{"search"})
 	}
 
-	urlFlag := searchCmd.Bool("url", false, config.Commands["search"].flags["url"])
-	stdoutFlag := searchCmd.Bool("stdout", false, config.Commands["search"].flags["stdout"])
-	docsFlag := searchCmd.Bool("docs", false, config.Commands["search"].flags["docs"])
-	metaFlag := searchCmd.Bool("meta", false, config.Commands["search"].flags["meta"])
-	nFlag := searchCmd.Int("n", 10, config.Commands["search"].flags["n"])
+	urlFlag := searchCmd.Bool("url", false, config.Commands["search"].Flags["url"])
+	stdoutFlag := searchCmd.Bool("stdout", false, config.Commands["search"].Flags["stdout"])
+	docsFlag := searchCmd.Bool("docs", false, config.Commands["search"].Flags["docs"])
+	metaFlag := searchCmd.Bool("meta", false, config.Commands["search"].Flags["meta"])
+	nFlag := searchCmd.Int("n", 10, config.Commands["search"].Flags["n"])
 
 	searchCmd.Parse(args)
 	args = searchCmd.Args()
@@ -85,8 +86,8 @@ func commandSearch(config *Config, args []string) error {
 	}
 	defer db.Close()
 
-	boltStore := BoltStore{
-		db: db,
+	boltStore := store.BoltStore{
+		DB: db,
 	}
 	ids, err := indexer.Search(&boltStore, query, numResult)
 	if err != nil {
@@ -119,6 +120,10 @@ func commandSearch(config *Config, args []string) error {
 	selectedID, err := promptSelectID(query, ids, &boltStore, numResult)
 	if err != nil {
 		return err
+	}
+	if selectedID == "" {
+		fmt.Fprintf(os.Stderr, "Cancel search\n")
+		return nil
 	}
 
 	doc, err := open(config, source, selectedID, &boltStore)
@@ -162,7 +167,7 @@ func commandSearch(config *Config, args []string) error {
 		return nil
 	}
 
-	err = render(doc.Content, config.Pager)
+	err = render.Render(doc.Content, config.Pager)
 	if err != nil {
 		return err
 	}

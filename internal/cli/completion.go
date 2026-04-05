@@ -1,4 +1,4 @@
-package main
+package cli
 
 import (
 	"fmt"
@@ -9,12 +9,12 @@ func genZshComp(config *Config) string {
 	commands := "\n"
 	for _, key := range sortStringMap(config.Commands) {
 		command := config.Commands[key]
-		commands += fmt.Sprintf("                '%s:%s'\n", command.name, command.description)
+		commands += fmt.Sprintf("                '%s:%s'\n", command.Name, command.Description)
 	}
 
 	searchFlags := "\n"
-	for _, flagName := range sortStringMap(config.Commands["search"].flags) {
-		flagDesc := config.Commands["search"].flags[flagName]
+	for _, flagName := range sortStringMap(config.Commands["search"].Flags) {
+		flagDesc := config.Commands["search"].Flags[flagName]
 		searchFlags += fmt.Sprintf("                        '--%s[%s]' \\\n", flagName, flagDesc)
 	}
 
@@ -89,7 +89,7 @@ compdef _scry scry
 
 func genBashComp(config *Config) string {
 	commands := strings.Join(sortStringMap(config.Commands), " ")
-	searchFlags := sortStringMap(config.Commands["search"].flags)
+	searchFlags := sortStringMap(config.Commands["search"].Flags)
 	for i, flag := range searchFlags {
 		searchFlags[i] = "--" + flag
 	}
