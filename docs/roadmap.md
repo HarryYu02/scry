@@ -36,20 +36,20 @@
 
 19. **Custom Scraper Documentation**: Write a clear tutorial in docs/ detailing how contributors can inherit from the base Python scraper class to add support for their own game wikis.
 
-20. **Rolling Dataset Releases:** Create a `gh` CLI script (or GitHub Action) to automatically upload freshly scraped `.jsonl.gz` datasets to a rolling `latest-datasets` release tag, preventing git history bloat while keeping users up-to-date.
+20. ~~**Sync command:** Implement a `sync` command to fetch the latest data.tar.gz from GitHub release page.~~
 
-21. **Structured Logging:** Implement standard library logging (Go `slog`, Python `logging`). Route all logs to `stderr` to keep `stdout` pure for terminal piping.
+21. ~~**Rolling Dataset Releases:** Create a `gh` CLI script (or GitHub Action) to automatically upload freshly scraped `.jsonl.gz` datasets to a rolling `latest-datasets` release tag, preventing git history bloat while keeping users up-to-date.~~
 
-22. **Comprehensive Testing:** Implement unit and integration tests across all three core components (Python Scraper, Go Indexer, and Go Search CLI) and add a `make test` target to execute them all.
+22. **Structured Logging:** Implement standard library logging (Go `slog`, Python `logging`). Route all logs to `stderr` to keep `stdout` pure for terminal piping.
 
-23. **Incremental indexing:** Only index data that has been modified.
+23. **Comprehensive Testing:** Implement unit and integration tests across all three core components (Python Scraper, Go Indexer, and Go Search CLI) and add a `make test` target to execute them all.
 
-24. **Concurrent indexing:** Index multiple documents concurrently to speed up indexing.
+24. **Incremental indexing:** Only index data that has been modified.
 
-25. **Deamon mode:** Run Scry as a daemon / server an a `scryd` binary.
+25. **Concurrent indexing:** Index multiple documents concurrently to speed up indexing.
 
-26. **Compress index:** Explore options to compress the index to make the file size smaller. Can sacrifice a little bit of performance.
+26. **Deamon mode:** Run Scry as a daemon / server an a `scryd` binary.
 
-27. **Sync command:** Implement a `sync` command to fetch the latest data.tar.gz from GitHub release page.
+27. **Compress index:** Explore options to compress the index to make the file size smaller. Can sacrifice a little bit of performance.
 
 28. **Scry index loading UI:** Implement a UI for indexing.

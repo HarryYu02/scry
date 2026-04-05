@@ -47,19 +47,13 @@ make install
 It will install to `$HOME/.local/bin`, make sure `$HOME/.local/bin` is in your $PATH.
 
 ### 2. Getting wiki data
-You can always write your custom scraper class and scrape the data,
-but I have included some example datasets in the [release](https://github.com/HarryYu02/scry/releases/tag/v2.0.0).
-
-Download the attached data.tar.gz files from the release.
-Then unzip and move the downloaded datasets to your local data directory:
+Sync your local data directory `~/.local/share/scry/data` with the latest release's data.tar.gz.
 ```bash
-tar xzf data.tar.gz
-mkdir -p ~/.local/share/scry/data
-mv *.jsonl ~/.local/share/scry/data/
+scry sync
 ```
 
 Optionally, you can install the Python scraper and scrape the data yourself.
-You will need uv installed for `scry-scraper`:
+You will need uv installed to install `scry-scraper`:
 ```bash
 make install-scraper
 scry-scraper stsfandom
@@ -81,6 +75,7 @@ Available commands:
 - list
 - remove
 - completion
+- sync
 
 Use "scry help \<command\>" for more information about a command.
 

@@ -66,5 +66,11 @@ func GetCommands() map[string]Command {
 			Usage:       "scry completion <shell>",
 			Callback:    commandCompletion,
 		},
+		"sync": {
+			Name:        "sync",
+			Description: "Sync local data repository with the latest released data (It will overwrite existing data!)",
+			Usage:       "scry sync",
+			Callback:    commandSync,
+		},
 	}
 }
