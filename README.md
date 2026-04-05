@@ -2,7 +2,7 @@
 Scry is a modular, offline-first, terminal-native search engine written in Go and Python.
 This is a mono-repo for both the Python scraper, the Go indexer, and the Go cli.
 
-![Using scry with fzf as a selector](https://github.com/HarryYu02/scry/blob/main/assets/fzf.gif "fzf integration")
+![Using scry with fzf as a selector](https://github.com/HarryYu02/scry/blob/main/assets/fzf.png "fzf integration")
 ![Search result of using scry search "shadowheart"](https://github.com/HarryYu02/scry/blob/main/assets/search.png "Search result")
 ![Rendering search result in less](https://github.com/HarryYu02/scry/blob/main/assets/render.png "Rendering in less")
 
