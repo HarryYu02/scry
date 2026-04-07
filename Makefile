@@ -21,20 +21,14 @@ install: build
 	@cp bin/$(BINARY_NAME) $(INSTALL_DIR)/$(BINARY_NAME)
 	@echo "scry installed successfully!"
 
-install-scraper:
-	@echo "installing scry-scraper..."
-	@UV_TOOL_BIN_DIR=$(INSTALL_DIR) uv tool install ./scraper --force
-	@echo "scry-scraper installed successfully!"
-
 uninstall:
 	@echo "removing $(BINARY_NAME)..."
 	@rm -f $(INSTALL_DIR)/$(BINARY_NAME)
 	@echo "scry removed!"
 
 clean:
-	@echo "Cleaning build directory..."
+	@echo "cleaning build directory..."
 	@rm -rf bin/
-	@rm -rf scraper/build/ scraper/*.egg-info/
 	@echo "all build directory cleaned!"
 
 purge: uninstall

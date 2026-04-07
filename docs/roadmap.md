@@ -34,11 +34,11 @@
 
 18. ~~**Shell integration:** Add completion for shell integration.~~
 
-19. **Custom Scraper Documentation**: Write a clear tutorial in docs/ detailing how contributors can inherit from the base Python scraper class to add support for their own game wikis.
+19. ~~**Sync command:** Implement a `sync` command to fetch the latest data.tar.gz from GitHub release page.~~
 
-20. ~~**Sync command:** Implement a `sync` command to fetch the latest data.tar.gz from GitHub release page.~~
+20. ~~**Rolling Dataset Releases:** Create a `gh` CLI script (or GitHub Action) to automatically upload freshly scraped `.jsonl.gz` datasets to a rolling `latest-datasets` release tag, preventing git history bloat while keeping users up-to-date.~~
 
-21. ~~**Rolling Dataset Releases:** Create a `gh` CLI script (or GitHub Action) to automatically upload freshly scraped `.jsonl.gz` datasets to a rolling `latest-datasets` release tag, preventing git history bloat while keeping users up-to-date.~~
+21. **Custom Scraper Documentation**: Write a clear tutorial in docs/ detailing how contributors can inherit from the base Python scraper class to add support for their own game wikis.
 
 22. **Structured Logging:** Implement standard library logging (Go `slog`, Python `logging`). Route all logs to `stderr` to keep `stdout` pure for terminal piping.
 
@@ -53,3 +53,5 @@
 27. **Compress index:** Explore options to compress the index to make the file size smaller. Can sacrifice a little bit of performance.
 
 28. **Scry index loading UI:** Implement a UI for indexing.
+
+29. **Splitting scry-scraper:** Splitting scry-scraper into its own repo.

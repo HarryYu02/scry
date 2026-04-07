@@ -1,0 +1,15 @@
+README.md
+main.py
+pyproject.toml
+scryscraper.egg-info/PKG-INFO
+scryscraper.egg-info/SOURCES.txt
+scryscraper.egg-info/dependency_links.txt
+scryscraper.egg-info/entry_points.txt
+scryscraper.egg-info/requires.txt
+scryscraper.egg-info/top_level.txt
+sources/__init__.py
+sources/base_scraper.py
+sources/bg3wiki/__init__.py
+sources/bg3wiki/scraper.py
+sources/stsfandom/__init__.py
+sources/stsfandom/scraper.py

@@ -1,0 +1,2 @@
+[console_scripts]
+scry-scraper = main:main
