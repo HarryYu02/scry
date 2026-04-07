@@ -3,6 +3,7 @@ package cli
 import (
 	"encoding/json"
 	"errors"
+	"flag"
 	"fmt"
 	"io"
 	"io/fs"
@@ -124,6 +125,16 @@ func open(config *Config, source, id string, boltStore *store.BoltStore) (indexe
 }
 
 func commandOpen(config *Config, args []string) error {
+	openCmd := flag.NewFlagSet("open", flag.ExitOnError)
+	openCmd.Usage = func() {
+		commandHelp(config, []string{"open"})
+	}
+
+	stdoutFlag := openCmd.Bool("stdout", false, config.Commands["open"].Flags["stdout"])
+
+	openCmd.Parse(args)
+	args = openCmd.Args()
+
 	if len(args) < 2 {
 		return fmt.Errorf("open expects a source and a doc_id")
 	}
@@ -143,6 +154,10 @@ func commandOpen(config *Config, args []string) error {
 		return err
 	}
 
+	if *stdoutFlag {
+		fmt.Printf("%s", doc.Content)
+		return nil
+	}
 	err = render.Render(doc.Content, config.Pager)
 	if err != nil {
 		return err

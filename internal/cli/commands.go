@@ -46,6 +46,9 @@ func GetCommands() map[string]Command {
 			Name:        "open",
 			Description: "Open a specific document in a source",
 			Usage:       "scry open <source> <doc_id>",
+			Flags: map[string]string{
+				"stdout": "Pipe content of document to stdout instead",
+			},
 			Callback:    commandOpen,
 		},
 		"list": {
