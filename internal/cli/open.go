@@ -91,6 +91,25 @@ func open(config *Config, source, id string, boltStore *store.BoltStore) (indexe
 	}
 	defer dataFile.Close()
 
+	dataStat, err := dataFile.Stat()
+	if err != nil {
+		return indexer.Document{}, err
+	}
+	dataLastMod := dataStat.ModTime()
+
+	indexFileName := fmt.Sprintf("%s%s", source, ".db")
+	indexPath := filepath.Join(config.Root, "index", indexFileName)
+	indexStat, err := os.Stat(indexPath)
+	if err != nil {
+		return indexer.Document{}, err
+	}
+	indexLastMod := indexStat.ModTime()
+
+	if dataLastMod.After(indexLastMod) {
+		return indexer.Document{},
+			fmt.Errorf("data might be modified since you last indexed it, please index it again.\n")
+	}
+
 	docBytes, err := readFrom(dataFile, pos)
 	if err != nil {
 		return indexer.Document{}, err

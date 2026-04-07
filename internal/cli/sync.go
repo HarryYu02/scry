@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"strings"
 	"time"
 )
 
@@ -129,15 +130,14 @@ func getData(config *Config, dataURL string) error {
 		if err != nil {
 			return err
 		}
-		if tarHeader.Name == "./" {
-			continue
-		}
-		if tarHeader.Typeflag != tar.TypeReg {
+		if tarHeader.Name == "./" ||
+			tarHeader.Typeflag != tar.TypeReg ||
+			!strings.HasSuffix(tarHeader.Name, ".jsonl") {
 			continue
 		}
 
 		dataPath := filepath.Join(config.Root, "data", tarHeader.Name)
-		fmt.Printf("Saving %s\n", dataPath)
+		fmt.Fprintf(os.Stderr, "Saving %s\n", dataPath)
 
 		err = os.MkdirAll(filepath.Dir(dataPath), 0755)
 		if err != nil {
@@ -199,6 +199,7 @@ func commandSync(config *Config, args []string) error {
 	if err != nil {
 		return err
 	}
+	fmt.Fprintf(os.Stderr, "Remember to re-index changed dataset.\n")
 
 	return nil
 }
