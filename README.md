@@ -62,17 +62,9 @@ scry search stsfandom "watcher scry"
 ```
 
 ## Usage
-Available commands:
-- help
-- index
-- search
-- open
-- list
-- remove
-- completion
-- sync
+To see all available commands, use `scry help`.
 
-Use "scry help \<command\>" for more information about a command.
+Use `scry help <command>` for more information about a command.
 
 Here are some useful integrations:
 

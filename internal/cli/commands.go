@@ -54,6 +54,12 @@ func GetCommands() map[string]Command {
 			Usage:       "scry list",
 			Callback:    commandList,
 		},
+		"list-data": {
+			Name:        "list-data",
+			Description: "List out all data available to index",
+			Usage:       "scry list-data",
+			Callback:    commandListData,
+		},
 		"remove": {
 			Name:        "remove",
 			Description: "Remove an existing index",

@@ -7,9 +7,9 @@ import (
 	"strings"
 )
 
-func commandList(config *Config, args []string) error {
-	indexDirPath := filepath.Join(config.Root, "index")
-	entries, err := os.ReadDir(indexDirPath)
+func commandListData(config *Config, args []string) error {
+	dataDirPath := filepath.Join(config.Root, "data")
+	entries, err := os.ReadDir(dataDirPath)
 	if err != nil {
 		return err
 	}
@@ -19,7 +19,7 @@ func commandList(config *Config, args []string) error {
 			continue
 		}
 		name := entry.Name()
-		before, found := strings.CutSuffix(name, ".db")
+		before, found := strings.CutSuffix(name, ".jsonl")
 		if !found {
 			continue
 		}
