@@ -1,6 +1,5 @@
 # Scry
-Scry is a modular, offline-first, terminal-native search engine written in Go and Python.
-This is a mono-repo for both the Python scraper, the Go indexer, and the Go cli.
+Scry is a modular, offline-first, terminal-native search engine written in Go.
 
 ## Examples
 ![Using scry with fzf as a selector](https://github.com/HarryYu02/scry/blob/main/assets/fzf.png "fzf integration")
@@ -25,7 +24,7 @@ It will be a ~5 minutes read but I would very much appreciate if you can give it
 
 ## Architecture
 The Scry project is split into three independent components:
-1. **Scry Scraper (scraper/):** Downloads wiki pages and compiles them into a `.jsonl` dataset.
+1. **Scry Scraper ([scry-scraper](https://github.com/HarryYu02/scry-scraper)):** Downloads wiki pages and compiles them into a `.jsonl` dataset.
 2. **Scry Lib (internal/):** An internal library that builds TF-IDF indexes and search from that dataset.
 3. **Scry CLI (cmd/scry/):** A CLI front end for user interaction.
 
@@ -34,8 +33,8 @@ The scraped data and indexes are stored at `$HOME/.local/share/scry`.
 ## Quick Start
 
 ### 1. Installation
-Simply download the binary from the latest [release](https://github.com/HarryYu02/scry/releases).
-Optionally, you can clone the main branch for the latest version as well.
+Simply download the binary from the [latest release](https://github.com/HarryYu02/scry/releases).
+Optionally, you can clone the main branch for the development version as well.
 
 you will need Go installed on your system:
 ```bash
@@ -53,11 +52,7 @@ scry sync
 ```
 
 Optionally, you can install the Python scraper and scrape the data yourself.
-You will need uv installed to install `scry-scraper`:
-```bash
-make install-scraper
-scry-scraper stsfandom
-```
+You will need uv installed to install [scry-scraper](https://github.com/HarryYu02/scry-scraper).
 
 ### 3. Try it out
 ```bash
